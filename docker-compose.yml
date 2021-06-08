@@ -1,0 +1,42 @@
+version: "3.2"
+
+services:
+  tenure-listener:
+    image: tenure-listener
+    build:
+      context: .
+      dockerfile: TenureListener/Dockerfile
+      args:
+        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+    ports:
+      - 3000:3000
+    environment:
+     - DynamoDb_LocalMode=true
+     - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
+     - AWS_REGION=eu-west-2
+     - AWS_ACCESS_KEY_ID=local
+     - AWS_SECRET_ACCESS_KEY=local
+    links:
+      - dynamodb-database
+
+  tenure-listener-test:
+    image: tenure-listener-test
+    build:
+      context: .
+      dockerfile: TenureListener.Tests/Dockerfile
+      args:
+        - LBHPACKAGESTOKEN=${LBHPACKAGESTOKEN}
+    environment:
+      - DynamoDb_LocalMode=true
+      - DynamoDb_LocalServiceUrl=http://dynamodb-database:8000
+      - AWS_REGION=eu-west-2
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    links:
+      - dynamodb-database
+
+  dynamodb-database:
+    image: amazon/dynamodb-local
+    ports:
+      - 8000:8000
+      
