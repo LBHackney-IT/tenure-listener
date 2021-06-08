@@ -68,17 +68,10 @@ namespace TenureListener
         /// <returns></returns>
         public async Task FunctionHandler(SQSEvent evnt, ILambdaContext context)
         {
-            try
+            // Do this in parallel???
+            foreach (var message in evnt.Records)
             {
-                // Do this in parallel???
-                foreach (var message in evnt.Records)
-                {
-                    await ProcessMessageAsync(message, context).ConfigureAwait(false);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "An exception");
+                await ProcessMessageAsync(message, context).ConfigureAwait(false);
             }
         }
 

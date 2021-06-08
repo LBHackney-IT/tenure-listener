@@ -14,12 +14,15 @@ using TenureListener.Boundary;
 using TenureListener.Domain;
 using TenureListener.Domain.Person;
 using TenureListener.Infrastructure;
+using TenureListener.Infrastructure.Exceptions;
+using Xunit;
 
 namespace TenureListener.Tests.E2ETests.Steps
 {
     public class AddNewPersonToTenureSteps : BaseSteps
     {
         private readonly Fixture _fixture = new Fixture();
+        private Exception _lastException;
 
         public AddNewPersonToTenureSteps()
         { }
@@ -50,8 +53,13 @@ namespace TenureListener.Tests.E2ETests.Steps
                                    .With(x => x.Records, new List<SQSEvent.SQSMessage> { CreateMessage(personId) })
                                    .Create();
 
-            var fn = new SqsFunction();
-            await fn.FunctionHandler(sqsEvent, lambdaContext);
+            Func<Task> func = async () =>
+            {
+                var fn = new SqsFunction();
+                await fn.FunctionHandler(sqsEvent, lambdaContext).ConfigureAwait(false);
+            };
+
+            _lastException = await Record.ExceptionAsync(func);
         }
 
         public async Task ThenTheTenureIsUpdatedWithTheUserDetails(
@@ -64,6 +72,27 @@ namespace TenureListener.Tests.E2ETests.Steps
             lastHouseholdMember.Id.Should().Be(personResponse.Id);
             lastHouseholdMember.FullName.Should().Be(personResponse.FullName);
             lastHouseholdMember.Type.Should().Be(HouseholdMembersType.Person);
+        }
+
+        public void ThenAPersonNotFoundExceptionIsThrown(Guid tenureId)
+        {
+            _lastException.Should().NotBeNull();
+            _lastException.Should().BeOfType(typeof(PersonNotFoundException));
+            (_lastException as PersonNotFoundException).Id.Should().Be(tenureId);
+        }
+
+        public void ThenAPersonHasNoTenuresExceptionIsThrown(Guid personId)
+        {
+            _lastException.Should().NotBeNull();
+            _lastException.Should().BeOfType(typeof(PersonHasNoTenuresException));
+            (_lastException as PersonHasNoTenuresException).Id.Should().Be(personId);
+        }
+
+        public void ThenATenureNotFoundExceptionIsThrown(Guid tenureId)
+        {
+            _lastException.Should().NotBeNull();
+            _lastException.Should().BeOfType(typeof(TenureNotFoundException));
+            (_lastException as TenureNotFoundException).Id.Should().Be(tenureId);
         }
     }
 }

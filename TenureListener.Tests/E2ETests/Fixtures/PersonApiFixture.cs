@@ -38,6 +38,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             {
                 if (_httpListener.IsListening)
                     _httpListener.Stop();
+                PersonResponse = null;
 
                 _disposed = true;
             }
@@ -86,11 +87,21 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             });
         }
 
+        public void GivenThePersonDoesNotExist(Guid personId)
+        {
+            // Nothing to do here
+        }
+
         public PersonResponseObject GivenThePersonExists(Guid personId)
         {
+            return GivenThePersonExists(personId, true);
+        }
+        public PersonResponseObject GivenThePersonExists(Guid personId, bool hasTenure)
+        {
+            int numberOfTenures = hasTenure ? 1 : 0;
             PersonResponse = _fixture.Build<PersonResponseObject>()
                                       .With(x => x.Id, personId)
-                                      .With(x => x.Tenures, _fixture.CreateMany<Tenure>(1))
+                                      .With(x => x.Tenures, _fixture.CreateMany<Tenure>(numberOfTenures))
                                       .Create();
             return PersonResponse;
         }

@@ -58,9 +58,9 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             }
         }
 
-        public void GivenATenureDoesNotExist()
+        public void GivenATenureDoesNotExist(Guid tenureId)
         {
-            TenureId = Guid.NewGuid();
+            // Nothing to do here
         }
     }
 }

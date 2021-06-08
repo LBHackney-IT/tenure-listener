@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
 using TenureListener.Domain;
-using TenureListener.Factories;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase.Interfaces;

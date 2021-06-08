@@ -59,5 +59,36 @@ namespace TenureListener.Tests.E2ETests.Stories
                                     PersonApiFixture.PersonResponse, _dbFixture.DynamoDbContext))
                 .BDDfy();
         }
+
+        [Fact]
+        public void UpdatedPersonNotFound()
+        {
+            var personId = Guid.NewGuid();
+            this.Given(g => _personApiFixture.GivenThePersonDoesNotExist(personId))
+                .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenAPersonNotFoundExceptionIsThrown(personId))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void UpdatedPersonHasNoTenures()
+        {
+            var personId = Guid.NewGuid();
+            this.Given(g => _personApiFixture.GivenThePersonExists(personId, false))
+                .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenAPersonHasNoTenuresExceptionIsThrown(personId))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void TenureNotFound()
+        {
+            var personId = Guid.NewGuid();
+            this.Given(g => _personApiFixture.GivenThePersonExists(personId))
+                .And(h => _tenureFixture.GivenATenureDoesNotExist(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .BDDfy();
+        }
     }
 }
