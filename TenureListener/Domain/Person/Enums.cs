@@ -5,11 +5,15 @@ namespace TenureListener.Domain.Person
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Title
     {
+        Dr,
+        Master,
+        Miss,
         Mr,
         Mrs,
-        Miss,
         Ms,
-        Dr
+        Other,
+        Rabbi,
+        Reverend
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -30,9 +34,8 @@ namespace TenureListener.Domain.Person
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum IdentificationType
     {
-        NI,
         Passport,
-        BirthCertificate
+        DrivingLicence
     }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
