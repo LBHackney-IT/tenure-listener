@@ -54,7 +54,7 @@ namespace TenureListener.Tests.E2ETests.Steps
             await fn.FunctionHandler(sqsEvent, lambdaContext);
         }
 
-        public async Task ThenTheTenureisUpdatedWithTheUserDetails(
+        public async Task ThenTheTenureIsUpdatedWithTheUserDetails(
             PersonResponseObject personResponse, IDynamoDBContext dbContext)
         {
             var tenureId = personResponse.Tenures.First().Id;

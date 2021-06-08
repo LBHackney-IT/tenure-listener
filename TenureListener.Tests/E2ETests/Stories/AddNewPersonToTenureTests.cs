@@ -55,7 +55,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExists(personId))
                 .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheTenureisUpdatedWithTheUserDetails(
+                .Then(t => _steps.ThenTheTenureIsUpdatedWithTheUserDetails(
                                     PersonApiFixture.PersonResponse, _dbFixture.DynamoDbContext))
                 .BDDfy();
         }
