@@ -2,7 +2,7 @@ using System;
 
 namespace TenureListener.Boundary
 {
-    public class PersonSns
+    public class EntityEventSns
     {
         public Guid Id { get; set; }
 

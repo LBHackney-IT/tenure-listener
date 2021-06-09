@@ -80,27 +80,27 @@ namespace TenureListener
         {
             context.Logger.LogLine($"Processing message {message.MessageId}");
 
-            var personSns = JsonSerializer.Deserialize<PersonSns>(message.Body, _jsonOptions);
+            var entityEvent = JsonSerializer.Deserialize<EntityEventSns>(message.Body, _jsonOptions);
 
-            using (Logger.BeginScope("CorrelationId: {CorrelationId}", personSns.CorrelationId))
+            using (Logger.BeginScope("CorrelationId: {CorrelationId}", entityEvent.CorrelationId))
             {
                 try
                 {
-                    switch (personSns.EventType)
+                    switch (entityEvent.EventType)
                     {
                         case "PersonCreatedEvent":
                             {
                                 var useCase = ServiceProvider.GetService<IAddNewPersonToTenure>();
-                                await useCase.ProcessMessageAsync(personSns).ConfigureAwait(false);
+                                await useCase.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
                                 break;
                             }
                         default:
-                            throw new ArgumentException($"Unknown event type: {personSns.EventType} on message id: {message.MessageId}");
+                            throw new ArgumentException($"Unknown event type: {entityEvent.EventType} on message id: {message.MessageId}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, $"Exception processing message id: {message.MessageId}; type: {personSns.EventType}; entity id: {personSns.EntityId}");
+                    Logger.LogError(ex, $"Exception processing message id: {message.MessageId}; type: {entityEvent.EventType}; entity id: {entityEvent.EntityId}");
                     throw; // AWS will handle retry/moving to the dead letter queue
                 }
             }

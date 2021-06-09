@@ -20,7 +20,7 @@ namespace TenureListener.UseCase
             _gateway = gateway;
         }
 
-        public async Task ProcessMessageAsync(PersonSns message)
+        public async Task ProcessMessageAsync(EntityEventSns message)
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
 

@@ -21,7 +21,7 @@ namespace TenureListener.Tests.UseCase
         private readonly Mock<ITenureInfoGateway> _mockGateway;
         private readonly AddNewPersonToTenure _sut;
 
-        private readonly PersonSns _message;
+        private readonly EntityEventSns _message;
         private readonly PersonResponseObject _person;
         private readonly TenureInformation _tenure;
 
@@ -56,9 +56,9 @@ namespace TenureListener.Tests.UseCase
                            .Create();
         }
 
-        private PersonSns CreateMessage(string eventType = "PersonCreatedEvent")
+        private EntityEventSns CreateMessage(string eventType = "PersonCreatedEvent")
         {
-            return _fixture.Build<PersonSns>()
+            return _fixture.Build<EntityEventSns>()
                            .With(x => x.EventType, eventType)
                            .Create();
         }

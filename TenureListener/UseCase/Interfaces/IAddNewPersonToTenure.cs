@@ -5,6 +5,6 @@ namespace TenureListener.UseCase.Interfaces
 {
     public interface IAddNewPersonToTenure
     {
-        Task ProcessMessageAsync(PersonSns message);
+        Task ProcessMessageAsync(EntityEventSns message);
     }
 }

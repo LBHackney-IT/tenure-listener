@@ -29,7 +29,7 @@ namespace TenureListener.Tests.E2ETests.Steps
 
         private SQSEvent.SQSMessage CreateMessage(Guid personId, string eventType = "PersonCreatedEvent")
         {
-            var personSns = _fixture.Build<PersonSns>()
+            var personSns = _fixture.Build<EntityEventSns>()
                                     .With(x => x.EntityId, personId)
                                     .With(x => x.EventType, eventType)
                                     .Create();
