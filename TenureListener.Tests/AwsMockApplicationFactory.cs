@@ -15,7 +15,6 @@ namespace TenureListener.Tests
 
         public IAmazonDynamoDB DynamoDb { get; private set; }
         public IDynamoDBContext DynamoDbContext { get; private set; }
-        //public IAmazonSQS SqsClient { get; private set; }
 
         public AwsMockApplicationFactory(List<TableDef> tables)
         {
@@ -33,28 +32,7 @@ namespace TenureListener.Tests
                DynamoDbContext = serviceProvider.GetRequiredService<IDynamoDBContext>();
 
                EnsureTablesExist(DynamoDb, _tables);
-
-               //var snsUrl = Environment.GetEnvironmentVariable("Localstack_SnsServiceUrl");
-               //SqsClient = new AmazonSQSClient(new AmazonSQSConfig()
-               //{
-               //    ServiceURL = snsUrl
-               //});
-               //EnsureSqsQueueExists(SqsClient);
            });
-
-        //private static void EnsureSqsQueueExists(IAmazonSQS sqsClient)
-        //{
-        //    var sqsAttrs = new Dictionary<string, string>();
-        //    sqsAttrs.Add("fifo_topic", "true");
-        //    sqsAttrs.Add("content_based_deduplication", "true");
-
-        //    var request = new CreateQueueRequest()
-        //    {
-        //        QueueName = "person",
-        //        Attributes = sqsAttrs
-        //    };
-        //    _ = sqsClient.CreateQueueAsync(request).GetAwaiter().GetResult();
-        //}
 
         private static void EnsureTablesExist(IAmazonDynamoDB dynamoDb, List<TableDef> tables)
         {

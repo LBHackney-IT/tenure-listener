@@ -29,6 +29,7 @@ namespace TenureListener.Tests.Gateway
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
         private const string PersonApiRoute = "https://some-domain.com/persons";
+        private const string PersonApiToken = "dksfghjskueygfakseygfaskjgfsdjkgfdkjsgfdkjgf";
 
         public PersonApiTests()
         {
@@ -39,7 +40,8 @@ namespace TenureListener.Tests.Gateway
                                   .Returns(_httpClient);
 
             var inMemorySettings = new Dictionary<string, string> {
-                { "GetPersonApi", PersonApiRoute }
+                { "GetPersonApi", PersonApiRoute },
+                { "GetPersonApiToken", PersonApiToken }
             };
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -61,9 +63,10 @@ namespace TenureListener.Tests.Gateway
 
         private static string Route(Guid id) => $"{PersonApiRoute}/{id}";
 
-        private static bool ValidateRequestUri(string expectedRoute, HttpRequestMessage request)
+        private static bool ValidateRequest(string expectedRoute, HttpRequestMessage request)
         {
-            return request.RequestUri.ToString() == expectedRoute;
+            return (request.RequestUri.ToString() == expectedRoute)
+                && (request.Headers.Authorization.ToString() == PersonApiToken);
         }
 
         private void SetupHttpClientResponse(string route, PersonResponseObject response)
@@ -74,7 +77,7 @@ namespace TenureListener.Tests.Gateway
                 null : new StringContent(JsonSerializer.Serialize(response, _jsonOptions));
             _mockHttpMessageHandler.Protected()
                    .Setup<Task<HttpResponseMessage>>("SendAsync",
-                        ItExpr.Is<HttpRequestMessage>(y => ValidateRequestUri(route, y)),
+                        ItExpr.Is<HttpRequestMessage>(y => ValidateRequest(route, y)),
                         ItExpr.IsAny<CancellationToken>())
                    .ReturnsAsync(new HttpResponseMessage
                    {
@@ -110,10 +113,27 @@ namespace TenureListener.Tests.Gateway
         [InlineData(null)]
         [InlineData("")]
         [InlineData("sdrtgdfstg")]
-        public void ConstructorTestInvalidConfigThrows(string invalidValue)
+        public void ConstructorTestInvalidRouteConfigThrows(string invalidValue)
         {
             var inMemorySettings = new Dictionary<string, string> {
                 { "GetPersonApi", invalidValue }
+            };
+            _configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            Action act = () => _ = new PersonApi(_mockHttpClientFactory.Object, _configuration);
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void ConstructorTestInvalidTokenConfigThrows(string invalidValue)
+        {
+            var inMemorySettings = new Dictionary<string, string> {
+                { "GetPersonApi", PersonApiRoute },
+                { "GetPersonApiToken", invalidValue }
             };
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)

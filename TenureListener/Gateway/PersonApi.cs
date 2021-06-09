@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -16,8 +17,10 @@ namespace TenureListener.Gateway
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _getPersonApiRoute;
+        private readonly string _getPersonApiToken;
 
         private const string PersonApiRouteKey = "GetPersonApi";
+        private const string PersonApiToken = "GetPersonApiToken";
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
         public PersonApi(IHttpClientFactory httpClientFactory, IConfiguration configuration)
@@ -26,6 +29,10 @@ namespace TenureListener.Gateway
             _getPersonApiRoute = configuration.GetValue<string>(PersonApiRouteKey)?.TrimEnd('/');
             if (string.IsNullOrEmpty(_getPersonApiRoute) || !Uri.IsWellFormedUriString(_getPersonApiRoute, UriKind.Absolute))
                 throw new ArgumentException($"Configuration does not contain a setting value for the key {PersonApiRouteKey}.");
+
+            _getPersonApiToken = configuration.GetValue<string>(PersonApiToken);
+            if (string.IsNullOrEmpty(_getPersonApiToken))
+                throw new ArgumentException($"Configuration does not contain a setting value for the key {PersonApiToken}.");
         }
 
         private static JsonSerializerOptions CreateJsonOptions()
@@ -42,13 +49,10 @@ namespace TenureListener.Gateway
         [LogCall]
         public async Task<PersonResponseObject> GetPersonByIdAsync(Guid id)
         {
-            // TODO: Can we call the Person function directly?
-
             var client = _httpClientFactory.CreateClient();
             var getPersonRoute = $"{_getPersonApiRoute}/{id}";
 
-            // TODO: Probably need to supply a token
-
+            client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(_getPersonApiToken);
             var response = await client.GetAsync(new Uri(getPersonRoute))
                                        .ConfigureAwait(false);
 

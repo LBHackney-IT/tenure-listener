@@ -18,6 +18,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         public static PersonResponseObject PersonResponse { get; private set; }
 
         public static string PersonApiRoute => "http://localhost:5678/api/v1/persons/";
+        public static string PersonApiToken => "sdjkhfgsdkjfgsdjfgh";
 
         public PersonApiFixture()
         {
@@ -58,6 +59,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         private void StartPersonApiStub()
         {
             Environment.SetEnvironmentVariable("GetPersonApi", PersonApiRoute);
+            Environment.SetEnvironmentVariable("GetPersonApiToken", PersonApiToken);
             Task.Run(() =>
             {
                 _httpListener = new HttpListener();
@@ -68,21 +70,28 @@ namespace TenureListener.Tests.E2ETests.Fixtures
                 HttpListenerContext context = _httpListener.GetContext();
                 HttpListenerResponse response = context.Response;
 
-                response.StatusCode = (int) ((PersonResponse is null) ? HttpStatusCode.NotFound : HttpStatusCode.OK);
-                string responseBody = string.Empty;
-                if (PersonResponse is null)
+                if (context.Request.Headers["Authorization"] != PersonApiToken)
                 {
-                    responseBody = context.Request.Url.Segments.Last();
+                    response.StatusCode = (int) HttpStatusCode.Unauthorized;
                 }
                 else
                 {
-                    responseBody = JsonSerializer.Serialize(PersonResponse, _jsonOptions);
-                }
-                Stream stream = response.OutputStream;
-                using (var writer = new StreamWriter(stream))
-                {
-                    writer.Write(responseBody);
-                    writer.Close();
+                    response.StatusCode = (int) ((PersonResponse is null) ? HttpStatusCode.NotFound : HttpStatusCode.OK);
+                    string responseBody = string.Empty;
+                    if (PersonResponse is null)
+                    {
+                        responseBody = context.Request.Url.Segments.Last();
+                    }
+                    else
+                    {
+                        responseBody = JsonSerializer.Serialize(PersonResponse, _jsonOptions);
+                    }
+                    Stream stream = response.OutputStream;
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        writer.Write(responseBody);
+                        writer.Close();
+                    }
                 }
             });
         }
