@@ -19,6 +19,9 @@ functions:
     name: ${self:service}-${self:provider.stage}
     handler: TenureListener::TenureListener.SqsFunction::FunctionHandler
     role: lambdaExecutionRole
+    environment:
+      GetPersonApi: ${ssm:/housing-tl/${self:provider.stage}/person-api-url}
+      PersonApiToken: ${ssm:/housing-tl/${self:provider.stage}/person-event-token}
     events:
       - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn} 
 
