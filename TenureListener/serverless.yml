@@ -20,8 +20,8 @@ functions:
     handler: TenureListener::TenureListener.SqsFunction::FunctionHandler
     role: lambdaExecutionRole
     environment:
-      GetPersonApi: ${ssm:/housing-tl/${self:provider.stage}/person-api-url}
-      PersonApiToken: ${ssm:/housing-tl/${self:provider.stage}/person-event-token}
+      PersonApiUrl: ${ssm:/housing-tl/${self:provider.stage}/person-api-url}
+      PersonApiToken: ${ssm:/housing-tl/${self:provider.stage}/person-api-token}
     events:
       - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn} 
 

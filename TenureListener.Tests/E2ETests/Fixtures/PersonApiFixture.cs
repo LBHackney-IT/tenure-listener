@@ -58,8 +58,8 @@ namespace TenureListener.Tests.E2ETests.Fixtures
 
         private void StartPersonApiStub()
         {
-            Environment.SetEnvironmentVariable("GetPersonApi", PersonApiRoute);
-            Environment.SetEnvironmentVariable("GetPersonApiToken", PersonApiToken);
+            Environment.SetEnvironmentVariable("PersonApiUrl", PersonApiRoute);
+            Environment.SetEnvironmentVariable("PersonApiToken", PersonApiToken);
             Task.Run(() =>
             {
                 _httpListener = new HttpListener();

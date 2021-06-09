@@ -19,16 +19,16 @@ namespace TenureListener.Gateway
         private readonly string _getPersonApiRoute;
         private readonly string _getPersonApiToken;
 
-        private const string PersonApiRouteKey = "GetPersonApi";
-        private const string PersonApiToken = "GetPersonApiToken";
+        private const string PersonApiUrl = "PersonApiUrl";
+        private const string PersonApiToken = "PersonApiToken";
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
         public PersonApi(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
-            _getPersonApiRoute = configuration.GetValue<string>(PersonApiRouteKey)?.TrimEnd('/');
+            _getPersonApiRoute = configuration.GetValue<string>(PersonApiUrl)?.TrimEnd('/');
             if (string.IsNullOrEmpty(_getPersonApiRoute) || !Uri.IsWellFormedUriString(_getPersonApiRoute, UriKind.Absolute))
-                throw new ArgumentException($"Configuration does not contain a setting value for the key {PersonApiRouteKey}.");
+                throw new ArgumentException($"Configuration does not contain a setting value for the key {PersonApiUrl}.");
 
             _getPersonApiToken = configuration.GetValue<string>(PersonApiToken);
             if (string.IsNullOrEmpty(_getPersonApiToken))

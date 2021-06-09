@@ -40,8 +40,8 @@ namespace TenureListener.Tests.Gateway
                                   .Returns(_httpClient);
 
             var inMemorySettings = new Dictionary<string, string> {
-                { "GetPersonApi", PersonApiRoute },
-                { "GetPersonApiToken", PersonApiToken }
+                { "PersonApiUrl", PersonApiRoute },
+                { "PersonApiToken", PersonApiToken }
             };
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -116,7 +116,7 @@ namespace TenureListener.Tests.Gateway
         public void ConstructorTestInvalidRouteConfigThrows(string invalidValue)
         {
             var inMemorySettings = new Dictionary<string, string> {
-                { "GetPersonApi", invalidValue }
+                { "PersonApiUrl", invalidValue }
             };
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -132,8 +132,8 @@ namespace TenureListener.Tests.Gateway
         public void ConstructorTestInvalidTokenConfigThrows(string invalidValue)
         {
             var inMemorySettings = new Dictionary<string, string> {
-                { "GetPersonApi", PersonApiRoute },
-                { "GetPersonApiToken", invalidValue }
+                { "PersonApiUrl", PersonApiRoute },
+                { "PersonApiToken", invalidValue }
             };
             _configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
