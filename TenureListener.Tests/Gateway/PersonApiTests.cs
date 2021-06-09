@@ -28,7 +28,7 @@ namespace TenureListener.Tests.Gateway
         private IConfiguration _configuration;
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
-        private const string PersonApiRoute = "https://some-domain.com/persons";
+        private const string PersonApiRoute = "https://some-domain.com/api/";
         private const string PersonApiToken = "dksfghjskueygfakseygfaskjgfsdjkgfdkjsgfdkjgf";
 
         public PersonApiTests()
@@ -61,7 +61,7 @@ namespace TenureListener.Tests.Gateway
             return options;
         }
 
-        private static string Route(Guid id) => $"{PersonApiRoute}/{id}";
+        private static string Route(Guid id) => $"{PersonApiRoute}persons/{id}";
 
         private static bool ValidateRequest(string expectedRoute, HttpRequestMessage request)
         {

@@ -17,7 +17,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         private static HttpListener _httpListener;
         public static PersonResponseObject PersonResponse { get; private set; }
 
-        public static string PersonApiRoute => "http://localhost:5678/api/v1/persons/";
+        public static string PersonApiRoute => "http://localhost:5678/api/v1/";
         public static string PersonApiToken => "sdjkhfgsdkjfgsdjfgh";
 
         public PersonApiFixture()

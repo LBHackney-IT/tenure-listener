@@ -50,7 +50,7 @@ namespace TenureListener.Gateway
         public async Task<PersonResponseObject> GetPersonByIdAsync(Guid id)
         {
             var client = _httpClientFactory.CreateClient();
-            var getPersonRoute = $"{_getPersonApiRoute}/{id}";
+            var getPersonRoute = $"{_getPersonApiRoute}/persons/{id}";
 
             client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(_getPersonApiToken);
             var response = await client.GetAsync(new Uri(getPersonRoute))
