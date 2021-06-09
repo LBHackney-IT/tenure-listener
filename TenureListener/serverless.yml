@@ -20,20 +20,9 @@ functions:
     handler: TenureListener::TenureListener.SqsFunction::FunctionHandler
     role: lambdaExecutionRole
     events:
-      - sqs: arn:aws:sqs:${self:provider.region}:XXXXXX:MyFirstQueue 
+      - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn} 
 
-      #- http:
-      #    path: /{proxy+}
-      #    method: ANY
-      #    authorizer:
-      #      arn: ${ssm:/api-authenticator/${self:provider.stage}/arn}
-      #      type: request
-      #      resultTtlInSeconds: 0
-      #      identitySource: method.request.header.Authorization
-      #      managedExternally: true       
-      #    cors: true
 resources:
-  Resources:
     lambdaExecutionRole:
       Type: AWS::IAM::Role
       Properties:
@@ -107,6 +96,7 @@ resources:
                           - Ref: 'AWS::Region'
                           - Ref: 'AWS::AccountId'
                           - 'table/TenureInformation'
+
 custom:
   vpc:
     development:

@@ -36,3 +36,51 @@ terraform {
     key     = "services/tenure-listener/state"
   }
 }
+
+
+data "aws_ssm_parameter" "person_sns_topic_arn" {
+  name = "/sns-topic/development/person_created/arn"
+}
+
+resource "aws_sqs_queue" "tenure_queue" {
+  name                        = "TenuresQueue.fifo"
+  fifo_topic                  = true
+  content_based_deduplication = true
+  kms_master_key_id = "alias/aws/sqs"
+}
+
+resource "aws_sqs_queue_policy" "tenure_queue_policy" {
+  queue_url = aws_sqs_queue.tenure_queue.id
+  policy = <<POLICY
+  {
+      "Version": "2012-10-17",
+      "Id": "sqspolicy",
+      "Statement": [
+      {
+          "Sid": "First",
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": "sqs:SendMessage",
+          "Resource": "${aws_sqs_queue.tenure_queue.arn}",
+          "Condition": {
+          "ArnEquals": {
+              "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
+          }
+          }
+      }
+      ]
+  }
+  POLICY
+}
+
+resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_person_sns" {
+  topic_arn = data.aws_ssm_parameter.sns_topic_arn.value
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.tenure_queue.arn
+}
+
+resource "aws_ssm_parameter" "tenures_sqs_queue_arn" {
+  name  = "/sqs-queue/staging/tenures/arn"
+  type  = "String"
+  value = aws_sqs_queue.tenure_queue.arn
+}
