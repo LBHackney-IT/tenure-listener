@@ -11,5 +11,9 @@ namespace TenureListener.Domain
         public string FullName { get; set; }
 
         public bool IsResponsible { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
+
+        public PersonTenureType PersonTenureType { get; set; }
     }
 }

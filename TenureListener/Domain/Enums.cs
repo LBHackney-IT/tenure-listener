@@ -15,4 +15,11 @@ namespace TenureListener.Domain
         Dwelling,
         Garage
     }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum PersonTenureType
+    {
+        Tenant,
+        Leaseholder,
+        Freeholder
+    }
 }
