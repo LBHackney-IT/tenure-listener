@@ -75,7 +75,7 @@ resource "aws_sqs_queue_policy" "tenure_queue_policy" {
 }
 
 resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_person_sns" {
-  topic_arn = data.aws_ssm_parameter.sns_topic_arn.value
+  topic_arn = data.aws_ssm_parameter.person_sns_topic_arn.value
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.tenure_queue.arn
 }
