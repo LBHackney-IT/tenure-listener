@@ -1,0 +1,20 @@
+{
+  "Records": [
+    {
+      "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
+      "receiptHandle": "MessageReceiptHandle",
+      "body": "{\"id\": \"8e648f3d-9556-4896-8400-211cb1c5451b\",\"eventType\": \"PersonCreatedEvent\",\"sourceDomain\": \"Person\",\"sourceSystem\": \"PersonAPI\",\"version\": \"v1\",\"correlationId\": \"f4d541d0-7c07-4524-8296-2d0d50cb58f4\",\"dateTime\": \"2021-05-17T11:59:57.25Z\",\"user\":{\"id\": \"ac703d87-c100-40ec-90a0-dabf183e7377\",\"name\": \"Joe Bloggs\",\"email\": \"joe.bloggs@hackney.gov.uk\"},\"entityId\": \"45c76564-2e38-48f3-bb31-6bab2fef8623\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1523232000000",
+        "SenderId": "123456789012",
+        "ApproximateFirstReceiveTimestamp": "1523232000001"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "7b270e59b47ff90a553787216d55d91d",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:{partition}:sqs:{region}:123456789012:MyQueue",
+      "awsRegion": "{region}"
+    }
+  ]
+}
