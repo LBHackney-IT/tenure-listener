@@ -43,8 +43,8 @@ data "aws_ssm_parameter" "person_sns_topic_arn" {
 }
 
 resource "aws_sqs_queue" "tenure_queue" {
-  name                        = "TenuresQueue.fifo"
-  fifo_topic                  = true
+  name                        = "tenuresqueue.fifo"
+  fifo_queue                  = true
   content_based_deduplication = true
   kms_master_key_id = "alias/aws/sqs"
 }
