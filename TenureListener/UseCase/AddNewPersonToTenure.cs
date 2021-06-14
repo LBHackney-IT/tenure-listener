@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
 using TenureListener.Domain;
+using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase.Interfaces;
@@ -38,11 +39,19 @@ namespace TenureListener.UseCase
 
             // 3. Update the tenure with the person details
             var membersList = tenure.HouseholdMembers.ToList();
+
+            bool isResponsible = false;
+            if (PersonType.Tenant == person.PersonTypes.First())
+                isResponsible = true;
+
             membersList.Add(new HouseholdMembers()
             {
                 Id = person.Id,
                 Type = HouseholdMembersType.Person,
-                FullName = person.FullName
+                FullName = person.FullName,
+                DateOfBirth = DateTime.Parse(person.DateOfBirth),
+                PersonTenureType = tenure.TenureType.GetPersonTenureType(isResponsible),
+                IsResponsible = isResponsible
             });
             tenure.HouseholdMembers = membersList;
 

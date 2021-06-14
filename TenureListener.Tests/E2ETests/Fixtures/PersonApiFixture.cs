@@ -103,13 +103,23 @@ namespace TenureListener.Tests.E2ETests.Fixtures
 
         public PersonResponseObject GivenThePersonExists(Guid personId)
         {
-            return GivenThePersonExists(personId, true);
+            return GivenThePersonExists(personId, true, PersonType.Tenant);
         }
         public PersonResponseObject GivenThePersonExists(Guid personId, bool hasTenure)
+        {
+            return GivenThePersonExists(personId, hasTenure, PersonType.Tenant);
+        }
+        public PersonResponseObject GivenThePersonExists(Guid personId, PersonType personType)
+        {
+            return GivenThePersonExists(personId, true, personType);
+        }
+        public PersonResponseObject GivenThePersonExists(Guid personId, bool hasTenure, PersonType personType)
         {
             int numberOfTenures = hasTenure ? 1 : 0;
             PersonResponse = _fixture.Build<PersonResponseObject>()
                                       .With(x => x.Id, personId)
+                                      .With(x => x.PersonTypes, new PersonType[] { personType })
+                                      .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-30).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ"))
                                       .With(x => x.Tenures, _fixture.CreateMany<Tenure>(numberOfTenures))
                                       .Create();
             return PersonResponse;

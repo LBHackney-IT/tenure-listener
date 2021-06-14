@@ -42,6 +42,19 @@ namespace TenureListener.Domain.Person
         public IEnumerable<PersonType> PersonTypes { get; set; }
         public IEnumerable<Tenure> Tenures { get; set; }
 
-        public string FullName => $"{Title} {FirstName} {MiddleName} {Surname}";
+        public string FullName => FormatFullName();
+
+        private string FormatFullName()
+        {
+            string firstName = FormatNamePart(FirstName);
+            string middleName = FormatNamePart(MiddleName);
+            string surname = FormatNamePart(Surname);
+            return $"{Title}{firstName}{middleName}{surname}";
+        }
+
+        private static string FormatNamePart(string part)
+        {
+            return string.IsNullOrEmpty(part) ? string.Empty : $" {part}";
+        }
     }
 }

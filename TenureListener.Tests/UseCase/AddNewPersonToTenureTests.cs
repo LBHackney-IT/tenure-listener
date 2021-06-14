@@ -46,6 +46,7 @@ namespace TenureListener.Tests.UseCase
             return _fixture.Build<PersonResponseObject>()
                            .With(x => x.Id, entityId)
                            .With(x => x.Tenures, tenures)
+                           .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-30).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ"))
                            .Create();
         }
 
@@ -142,9 +143,13 @@ namespace TenureListener.Tests.UseCase
             func.Should().ThrowAsync<Exception>().WithMessage(exMsg);
         }
 
-        [Fact]
-        public async Task ProcessMessageAsyncTestSuccess()
+        [Theory]
+        [InlineData(PersonType.Tenant)]
+        [InlineData(PersonType.HouseholdMember)]
+        public async Task ProcessMessageAsyncTestSuccess(PersonType personType)
         {
+            _person.PersonTypes = new[] { personType };
+
             _mockPersonApi.Setup(x => x.GetPersonByIdAsync(_message.EntityId))
                                        .ReturnsAsync(_person);
             _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_person.Tenures.First().Id))
@@ -158,11 +163,15 @@ namespace TenureListener.Tests.UseCase
 
         private bool VerifyUpdatedTenure(TenureInformation updated, PersonResponseObject person)
         {
+            var isResponsible = person.PersonTypes.First() == PersonType.Tenant;
             var expected = new HouseholdMembers()
             {
                 Id = person.Id,
                 Type = HouseholdMembersType.Person,
-                FullName = person.FullName
+                FullName = person.FullName,
+                DateOfBirth = DateTime.Parse(person.DateOfBirth),
+                IsResponsible = isResponsible,
+                PersonTenureType = updated.TenureType.GetPersonTenureType(isResponsible)
             };
             updated.HouseholdMembers.Last().Should().BeEquivalentTo(expected);
             return true;

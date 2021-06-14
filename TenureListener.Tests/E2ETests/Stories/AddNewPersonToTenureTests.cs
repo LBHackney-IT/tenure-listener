@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using TenureListener.Domain.Person;
 using TenureListener.Tests.E2ETests.Fixtures;
 using TenureListener.Tests.E2ETests.Steps;
 using TestStack.BDDfy;
@@ -48,11 +49,13 @@ namespace TenureListener.Tests.E2ETests.Stories
             }
         }
 
-        [Fact]
-        public void ListenerUpdatesTheTenure()
+        [Theory]
+        [InlineData(PersonType.Tenant)]
+        [InlineData(PersonType.HouseholdMember)]
+        public void ListenerUpdatesTheTenure(PersonType personType)
         {
             var personId = Guid.NewGuid();
-            this.Given(g => _personApiFixture.GivenThePersonExists(personId))
+            this.Given(g => _personApiFixture.GivenThePersonExists(personId, personType))
                 .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
                 .Then(t => _steps.ThenTheTenureIsUpdatedWithTheUserDetails(

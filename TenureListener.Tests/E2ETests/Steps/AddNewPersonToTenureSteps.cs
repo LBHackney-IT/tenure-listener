@@ -72,6 +72,10 @@ namespace TenureListener.Tests.E2ETests.Steps
             lastHouseholdMember.Id.Should().Be(personResponse.Id);
             lastHouseholdMember.FullName.Should().Be(personResponse.FullName);
             lastHouseholdMember.Type.Should().Be(HouseholdMembersType.Person);
+            lastHouseholdMember.DateOfBirth.Should().Be(DateTime.Parse(personResponse.DateOfBirth));
+            var isResponsible = personResponse.PersonTypes.First() == PersonType.Tenant;
+            lastHouseholdMember.IsResponsible.Should().Be(isResponsible);
+            lastHouseholdMember.PersonTenureType.Should().Be(tenureInfo.TenureType.GetPersonTenureType(isResponsible));
         }
 
         public void ThenAPersonNotFoundExceptionIsThrown(Guid tenureId)
