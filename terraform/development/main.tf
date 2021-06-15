@@ -54,7 +54,6 @@ resource "aws_sqs_queue" "tenure_queue" {
   name                        = "tenuresqueue.fifo"
   fifo_queue                  = true
   content_based_deduplication = true
-  kms_master_key_id           = "alias/aws/sqs"  
   redrive_policy              = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.tenure_dead_letter_queue.arn,
     maxReceiveCount     = 3
