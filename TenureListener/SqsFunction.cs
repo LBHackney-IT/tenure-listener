@@ -79,7 +79,6 @@ namespace TenureListener
         private async Task ProcessMessageAsync(SQSEvent.SQSMessage message, ILambdaContext context)
         {
             context.Logger.LogLine($"Processing message {message.MessageId}");
-            context.Logger.LogLine($"Message body: {message.Body}");
 
             var entityEvent = JsonSerializer.Deserialize<EntityEventSns>(message.Body, _jsonOptions);
 
