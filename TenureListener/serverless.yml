@@ -106,9 +106,13 @@ resources:
               Statement:
                 - Effect: Allow
                   Action:
+                    - "sqs:ChangeMessageVisibility"
                     - "sqs:DeleteMessage"
                     - "sqs:GetQueueAttributes"
+                    - "sqs:GetQueueUrl"
+                    - "sqs:ListQueueTags"
                     - "sqs:ReceiveMessage"
+                    - "sqs:SendMessage"
                     - "kms:Decrypt"
                   Resource: "*"
 

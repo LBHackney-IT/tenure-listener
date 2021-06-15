@@ -43,11 +43,21 @@ data "aws_ssm_parameter" "person_sns_topic_arn" {
   name = "/sns-topic/development/person_created/arn"
 }
 
+resource "aws_sqs_queue" "tenure_dead_letter_queue" {
+  name                        = "tenuresdeadletterqueue.fifo"
+  fifo_queue                  = true
+  content_based_deduplication = true
+  kms_master_key_id           = "alias/aws/sqs"
+}
+
 resource "aws_sqs_queue" "tenure_queue" {
   name                        = "tenuresqueue.fifo"
   fifo_queue                  = true
   content_based_deduplication = true
-  kms_master_key_id = "alias/aws/sqs"
+  redrive_policy              = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.tenure_dead_letter_queue.arn,
+    maxReceiveCount     = 3
+  })
 }
 
 resource "aws_sqs_queue_policy" "tenure_queue_policy" {
@@ -78,6 +88,7 @@ resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_person_sns" {
   topic_arn = data.aws_ssm_parameter.person_sns_topic_arn.value
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.tenure_queue.arn
+  raw_message_delivery = true
 }
 
 resource "aws_ssm_parameter" "tenures_sqs_queue_arn" {
