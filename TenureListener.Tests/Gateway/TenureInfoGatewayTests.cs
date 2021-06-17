@@ -72,7 +72,7 @@ namespace TenureListener.Tests.Gateway
                                  .With(x => x.EvictionDate, DateTime.UtcNow)
                                  .With(x => x.VersionNumber, (int?) null)
                                  .Create();
-            
+
             if (nullTenuredAssetType)
                 entity.TenuredAsset.Type = null;
 
