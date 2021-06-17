@@ -50,13 +50,15 @@ namespace TenureListener.Tests.E2ETests.Stories
         }
 
         [Theory]
-        [InlineData(PersonType.Tenant)]
-        [InlineData(PersonType.HouseholdMember)]
-        public void ListenerUpdatesTheTenure(PersonType personType)
+        [InlineData(PersonType.Tenant, false)]
+        [InlineData(PersonType.Tenant, true)]
+        [InlineData(PersonType.HouseholdMember, false)]
+        [InlineData(PersonType.HouseholdMember, true)]
+        public void ListenerUpdatesTheTenure(PersonType personType, bool nullTenuredAssetType)
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, personType))
-                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id, nullTenuredAssetType))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
                 .Then(t => _steps.ThenTheTenureIsUpdatedWithTheUserDetails(
                                     PersonApiFixture.PersonResponse, _dbFixture.DynamoDbContext))

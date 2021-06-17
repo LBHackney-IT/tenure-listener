@@ -61,9 +61,9 @@ namespace TenureListener.Tests.Gateway
             _cleanup.Add(async () => await DynamoDb.DeleteAsync<TenureInformationDb>(entity.Id).ConfigureAwait(false));
         }
 
-        private TenureInformation ConstructTenureInformation()
+        private TenureInformation ConstructTenureInformation(bool nullTenuredAssetType = false)
         {
-            return _fixture.Build<TenureInformation>()
+            var entity = _fixture.Build<TenureInformation>()
                                  .With(x => x.EndOfTenureDate, DateTime.UtcNow)
                                  .With(x => x.StartOfTenureDate, DateTime.UtcNow)
                                  .With(x => x.SuccessionDate, DateTime.UtcNow)
@@ -72,6 +72,11 @@ namespace TenureListener.Tests.Gateway
                                  .With(x => x.EvictionDate, DateTime.UtcNow)
                                  .With(x => x.VersionNumber, (int?) null)
                                  .Create();
+            
+            if (nullTenuredAssetType)
+                entity.TenuredAsset.Type = null;
+
+            return entity;
         }
 
         [Fact]
@@ -84,10 +89,12 @@ namespace TenureListener.Tests.Gateway
             _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {id}", Times.Once());
         }
 
-        [Fact]
-        public async Task GetTenureInfoByIdAsyncReturnsTheEntityIfItExists()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task GetTenureInfoByIdAsyncReturnsTheEntityIfItExists(bool nullTenuredAssetType)
         {
-            var tenure = ConstructTenureInformation();
+            var tenure = ConstructTenureInformation(nullTenuredAssetType);
             await InsertDatatoDynamoDB(tenure).ConfigureAwait(false);
 
             var response = await _classUnderTest.GetTenureInfoByIdAsync(tenure.Id).ConfigureAwait(false);
@@ -96,10 +103,12 @@ namespace TenureListener.Tests.Gateway
             _logger.VerifyExact(LogLevel.Debug, $"Calling IDynamoDBContext.LoadAsync for id {tenure.Id}", Times.Once());
         }
 
-        [Fact]
-        public async Task UpdateTenureInfoAsyncUpdatesDatabase()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task UpdateTenureInfoAsyncUpdatesDatabase(bool nullTenuredAssetType)
         {
-            var tenure = ConstructTenureInformation();
+            var tenure = ConstructTenureInformation(nullTenuredAssetType);
             await InsertDatatoDynamoDB(tenure).ConfigureAwait(false);
 
             tenure.HouseholdMembers = _fixture.CreateMany<HouseholdMembers>(5);
