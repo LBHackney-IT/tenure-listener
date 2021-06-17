@@ -6,7 +6,7 @@ namespace TenureListener.Domain
     {
         public Guid Id { get; set; }
 
-        public TenuredAssetType Type { get; set; }
+        public TenuredAssetType? Type { get; set; }
 
         public string FullAddress { get; set; }
 

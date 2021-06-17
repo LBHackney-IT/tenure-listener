@@ -38,7 +38,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             }
         }
 
-        public void GivenATenureAlreadyExists(Guid tenureId)
+        public void GivenATenureAlreadyExists(Guid tenureId, bool nullTenuredAssetType)
         {
             if (null == Tenure)
             {
@@ -52,6 +52,9 @@ namespace TenureListener.Tests.E2ETests.Fixtures
                                      .With(x => x.EvictionDate, DateTime.UtcNow)
                                      .With(x => x.VersionNumber, (int?) null)
                                      .Create();
+                if (nullTenuredAssetType)
+                    tenure.TenuredAsset.Type = null;
+
                 _dbContext.SaveAsync<TenureInformationDb>(tenure).GetAwaiter().GetResult();
                 Tenure = tenure;
                 TenureId = tenure.Id;
