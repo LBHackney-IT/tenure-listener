@@ -57,7 +57,7 @@ namespace TenureListener.Tests.UseCase
                            .Create();
         }
 
-        private EntityEventSns CreateMessage(string eventType = "PersonCreatedEvent")
+        private EntityEventSns CreateMessage(string eventType = EventTypes.PersonCreatedEvent)
         {
             return _fixture.Build<EntityEventSns>()
                            .With(x => x.EventType, eventType)

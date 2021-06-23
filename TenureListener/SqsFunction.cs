@@ -52,6 +52,8 @@ namespace TenureListener
 
             services.AddHttpClient();
             services.AddScoped<IAddNewPersonToTenure, AddNewPersonToTenure>();
+            services.AddScoped<IUpdatePersonDetailsOnTenure, UpdatePersonDetailsOnTenure>();
+
             services.AddScoped<IPersonApi, PersonApi>();
             services.AddScoped<ITenureInfoGateway, TenureInfoGateway>();
 
@@ -86,17 +88,24 @@ namespace TenureListener
             {
                 try
                 {
+                    IMessageProcessing processor = null;
                     switch (entityEvent.EventType)
                     {
-                        case "PersonCreatedEvent":
+                        case EventTypes.PersonCreatedEvent:
                             {
-                                var useCase = ServiceProvider.GetService<IAddNewPersonToTenure>();
-                                await useCase.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
+                                processor = ServiceProvider.GetService<IAddNewPersonToTenure>();
+                                break;
+                            }
+                        case EventTypes.PersonUpdatedEvent:
+                            {
+                                processor = ServiceProvider.GetService<IUpdatePersonDetailsOnTenure>();
                                 break;
                             }
                         default:
                             throw new ArgumentException($"Unknown event type: {entityEvent.EventType} on message id: {message.MessageId}");
                     }
+
+                    await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
