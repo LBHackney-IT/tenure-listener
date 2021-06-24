@@ -10,7 +10,7 @@ namespace TenureListener.Domain.Person
         /// <example>Mr, Mrs, Miss</example>
         public Title Title { get; set; }
         /// <example>Mr, Mrs, Miss</example>
-        public Title PreferredTitle { get; set; }
+        public Title? PreferredTitle { get; set; }
         /// <example>Julie</example>
         public string PreferredFirstName { get; set; }
         /// <example>Evans</example>
@@ -35,7 +35,7 @@ namespace TenureListener.Domain.Person
         public string DateOfBirth { get; set; }
         /// <example>M, F</example>
         public string Reason { get; set; }
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
         public IEnumerable<Identification> Identifications { get; set; }
         public IEnumerable<Language> Languages { get; set; }
         public IEnumerable<CommunicationRequirement> CommunicationRequirements { get; set; }
