@@ -144,11 +144,18 @@ namespace TenureListener.Tests.UseCase
         }
 
         [Theory]
-        [InlineData(PersonType.Tenant)]
-        [InlineData(PersonType.HouseholdMember)]
-        public async Task ProcessMessageAsyncTestSuccess(PersonType personType)
+        [InlineData(PersonType.Tenant, true)]
+        [InlineData(PersonType.Tenant, false)]
+        [InlineData(PersonType.HouseholdMember, true)]
+        [InlineData(PersonType.HouseholdMember, false)]
+        public async Task ProcessMessageAsyncTestSuccess(PersonType personType, bool nullableEnums)
         {
             _person.PersonTypes = new[] { personType };
+            if (nullableEnums)
+            {
+                _person.Gender = null;
+                _person.PreferredTitle = null;
+            }
 
             _mockPersonApi.Setup(x => x.GetPersonByIdAsync(_message.EntityId))
                                        .ReturnsAsync(_person);
