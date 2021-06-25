@@ -10,7 +10,7 @@ namespace TenureListener.Tests.E2ETests.Stories
 {
     [Story(
         AsA = "SQS Tenure Listener",
-        IWant = "an function to process the person created message",
+        IWant = "a function to process the person created message",
         SoThat = "The person details are set on the tenure")]
     [Collection("Aws collection")]
     public class AddNewPersonToTenureTests : IDisposable
