@@ -38,13 +38,13 @@ namespace TenureListener.Tests.E2ETests.Stories
 
         private bool _disposed;
 
-        public PersonApiFixture PersonApiFixture => _personApiFixture;
+        //public PersonApiFixture PersonApiFixture => _personApiFixture;
 
         protected virtual void Dispose(bool disposing)
         {
             if (disposing && !_disposed)
             {
-                PersonApiFixture.Dispose();
+                _personApiFixture.Dispose();
                 _tenureFixture.Dispose();
 
                 _disposed = true;
