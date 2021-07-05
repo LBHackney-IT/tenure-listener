@@ -19,15 +19,15 @@ using Xunit;
 
 namespace TenureListener.Tests.E2ETests.Steps
 {
-    public class AddNewPersonToTenureSteps : BaseSteps
+    public class UpdatePersonDetailsOnTenureSteps : BaseSteps
     {
         private readonly Fixture _fixture = new Fixture();
         private Exception _lastException;
 
-        public AddNewPersonToTenureSteps()
+        public UpdatePersonDetailsOnTenureSteps()
         { }
 
-        private SQSEvent.SQSMessage CreateMessage(Guid personId, string eventType = EventTypes.PersonCreatedEvent)
+        private SQSEvent.SQSMessage CreateMessage(Guid personId, string eventType = EventTypes.PersonUpdatedEvent)
         {
             var personSns = _fixture.Build<EntityEventSns>()
                                     .With(x => x.EntityId, personId)
@@ -78,6 +78,18 @@ namespace TenureListener.Tests.E2ETests.Steps
             lastHouseholdMember.PersonTenureType.Should().Be(tenureInfo.TenureType.GetPersonTenureType(isResponsible));
         }
 
+        public async Task ThenAllTenuresAreUpdated(IDynamoDBContext dbContext, PersonResponseObject personResponse)
+        {
+            foreach (var personTenureId in personResponse.Tenures.Select(x => x.Id))
+            {
+                var tenure = await dbContext.LoadAsync<TenureInformationDb>(personTenureId).ConfigureAwait(false);
+
+                var householdMember = tenure.HouseholdMembers.First(x => x.Id == personResponse.Id);
+                householdMember.FullName.Should().BeEquivalentTo(personResponse.FullName);
+                householdMember.DateOfBirth.Should().Be(DateTime.Parse(personResponse.DateOfBirth));
+            }
+        }
+
         public void ThenAPersonNotFoundExceptionIsThrown(Guid tenureId)
         {
             _lastException.Should().NotBeNull();
@@ -85,18 +97,13 @@ namespace TenureListener.Tests.E2ETests.Steps
             (_lastException as PersonNotFoundException).Id.Should().Be(tenureId);
         }
 
-        public void ThenAPersonHasNoTenuresExceptionIsThrown(Guid personId)
+        public async Task ThenNoChangesAreMade(IDynamoDBContext dbContext, params TenureInformationDb[] existingTenures)
         {
-            _lastException.Should().NotBeNull();
-            _lastException.Should().BeOfType(typeof(PersonHasNoTenuresException));
-            (_lastException as PersonHasNoTenuresException).Id.Should().Be(personId);
-        }
-
-        public void ThenATenureNotFoundExceptionIsThrown(Guid tenureId)
-        {
-            _lastException.Should().NotBeNull();
-            _lastException.Should().BeOfType(typeof(TenureNotFoundException));
-            (_lastException as TenureNotFoundException).Id.Should().Be(tenureId);
+            foreach (var existingTenure in existingTenures)
+            {
+                var tenure = await dbContext.LoadAsync<TenureInformationDb>(existingTenure.Id).ConfigureAwait(false);
+                tenure.Should().BeEquivalentTo(existingTenure);
+            }
         }
     }
 }

@@ -96,6 +96,21 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             });
         }
 
+        public PersonResponseObject GivenThePersonExistsWithMultipleTenures(Guid personId, int numberOfTenures)
+        {
+            return GivenThePersonExistsWithMultipleTenures(personId, numberOfTenures, PersonType.Tenant);
+        }
+        public PersonResponseObject GivenThePersonExistsWithMultipleTenures(Guid personId, int numberOfTenures, PersonType personType)
+        {
+            PersonResponse = _fixture.Build<PersonResponseObject>()
+                                      .With(x => x.Id, personId)
+                                      .With(x => x.PersonTypes, new PersonType[] { personType })
+                                      .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-30).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ"))
+                                      .With(x => x.Tenures, _fixture.CreateMany<Tenure>(numberOfTenures))
+                                      .Create();
+            return PersonResponse;
+        }
+
         public void GivenThePersonDoesNotExist(Guid personId)
         {
             // Nothing to do here
@@ -116,13 +131,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         public PersonResponseObject GivenThePersonExists(Guid personId, bool hasTenure, PersonType personType)
         {
             int numberOfTenures = hasTenure ? 1 : 0;
-            PersonResponse = _fixture.Build<PersonResponseObject>()
-                                      .With(x => x.Id, personId)
-                                      .With(x => x.PersonTypes, new PersonType[] { personType })
-                                      .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-30).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ"))
-                                      .With(x => x.Tenures, _fixture.CreateMany<Tenure>(numberOfTenures))
-                                      .Create();
-            return PersonResponse;
+            return GivenThePersonExistsWithMultipleTenures(personId, numberOfTenures, personType);
         }
     }
 }

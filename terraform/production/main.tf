@@ -39,7 +39,7 @@ terraform {
 
 
 data "aws_ssm_parameter" "person_sns_topic_arn" {
-  name = "/sns-topic/production/person_created/arn"
+  name = "/sns-topic/production/person/arn"
 }
 
 resource "aws_sqs_queue" "tenure_dead_letter_queue" {
