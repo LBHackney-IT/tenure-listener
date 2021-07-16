@@ -19,5 +19,9 @@ namespace TenureListener.Domain.Person
         public string Uprn { get; set; }
 
         public bool IsActive { get; set; }
+
+        public string PaymentReference { get; set; }
+
+        public string PropertyReference { get; set; }
     }
 }
