@@ -1,8 +1,8 @@
 using AutoFixture;
-using FluentAssertions;
 using TenureListener.Domain;
 using TenureListener.Factories;
 using TenureListener.Infrastructure;
+using FluentAssertions;
 using Xunit;
 
 namespace TenureListener.Tests.Factories
@@ -17,7 +17,7 @@ namespace TenureListener.Tests.Factories
             var databaseEntity = _fixture.Create<TenureInformationDb>();
             var entity = databaseEntity.ToDomain();
 
-            databaseEntity.Should().BeEquivalentTo(entity, config => config.Excluding(x => x.IsActive));
+            databaseEntity.Should().BeEquivalentTo(entity);
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace TenureListener.Tests.Factories
             var entity = _fixture.Create<TenureInformation>();
             var databaseEntity = entity.ToDatabase();
 
-            databaseEntity.Should().BeEquivalentTo(entity, config => config.Excluding(x => x.IsActive));
+            entity.Should().BeEquivalentTo(databaseEntity);
         }
     }
 }

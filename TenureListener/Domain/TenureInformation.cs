@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace TenureListener.Domain
 {
@@ -15,10 +14,7 @@ namespace TenureListener.Domain
         public DateTime StartOfTenureDate { get; set; }
         public DateTime EndOfTenureDate { get; set; }
         public TenureType TenureType { get; set; }
-
-        [JsonIgnore]
-        public bool IsActive => TenureHelpers.IsTenureActive(EndOfTenureDate);
-
+        public bool IsActive { get; set; }
         public bool IsTenanted { get; set; }
         public Terminated Terminated { get; set; }
         public DateTime SuccessionDate { get; set; }

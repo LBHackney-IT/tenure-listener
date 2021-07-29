@@ -38,6 +38,9 @@ namespace TenureListener.Infrastructure
         public TenureType TenureType { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
+        public bool IsActive { get; set; }
+
+        [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
         public bool IsTenanted { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Terminated>))]

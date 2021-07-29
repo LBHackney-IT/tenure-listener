@@ -23,6 +23,7 @@ namespace TenureListener.Factories
                 EvictionDate = databaseEntity.EvictionDate,
                 HouseholdMembers = databaseEntity.HouseholdMembers,
                 InformHousingBenefitsForChanges = databaseEntity.InformHousingBenefitsForChanges,
+                IsActive = databaseEntity.IsActive,
                 IsMutualExchange = databaseEntity.IsMutualExchange,
                 IsSublet = databaseEntity.IsSublet,
                 IsTenanted = databaseEntity.IsTenanted,
@@ -40,6 +41,7 @@ namespace TenureListener.Factories
 
         public static TenureInformationDb ToDatabase(this TenureInformation entity)
         {
+
             return new TenureInformationDb
             {
                 Id = entity.Id,
@@ -55,6 +57,7 @@ namespace TenureListener.Factories
                 EvictionDate = entity.EvictionDate,
                 HouseholdMembers = entity.HouseholdMembers.ToList(),
                 InformHousingBenefitsForChanges = entity.InformHousingBenefitsForChanges,
+                IsActive = entity.IsActive,
                 IsMutualExchange = entity.IsMutualExchange,
                 IsSublet = entity.IsSublet,
                 IsTenanted = entity.IsTenanted,
