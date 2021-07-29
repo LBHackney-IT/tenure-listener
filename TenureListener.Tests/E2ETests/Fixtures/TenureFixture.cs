@@ -18,6 +18,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         public List<TenureInformationDb> Tenures { get; private set; }
 
         public Guid TenureId { get; private set; }
+        private readonly List<Action> _cleanup = new List<Action>();
 
         public TenureFixture(IDynamoDBContext dbContext)
         {
@@ -37,6 +38,12 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             {
                 if (null != Tenure)
                     _dbContext.DeleteAsync<TenureInformationDb>(Tenure.Id).GetAwaiter().GetResult();
+
+                if ((Tenures != null) && Tenures.Any())
+                {
+                    foreach (var t in Tenures)
+                        _dbContext.DeleteAsync<TenureInformationDb>(t.Id).GetAwaiter().GetResult();
+                }
 
                 _disposed = true;
             }
