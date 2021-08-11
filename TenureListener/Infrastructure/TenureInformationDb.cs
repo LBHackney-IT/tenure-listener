@@ -32,7 +32,7 @@ namespace TenureListener.Infrastructure
         public DateTime StartOfTenureDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime EndOfTenureDate { get; set; }
+        public DateTime? EndOfTenureDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<TenureType>))]
         public TenureType TenureType { get; set; }

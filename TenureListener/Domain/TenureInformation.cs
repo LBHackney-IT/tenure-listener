@@ -13,7 +13,7 @@ namespace TenureListener.Domain
         public AccountType AccountType { get; set; }
         public Charges Charges { get; set; }
         public DateTime StartOfTenureDate { get; set; }
-        public DateTime EndOfTenureDate { get; set; }
+        public DateTime? EndOfTenureDate { get; set; }
         public TenureType TenureType { get; set; }
 
         [JsonIgnore]
