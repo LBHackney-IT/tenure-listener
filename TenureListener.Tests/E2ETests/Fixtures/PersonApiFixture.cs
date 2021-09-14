@@ -16,6 +16,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
         private readonly JsonSerializerOptions _jsonOptions;
         private static HttpListener _httpListener;
         public static PersonResponseObject PersonResponse { get; private set; }
+        public static int CallsMade { get; private set; }
 
         public static string PersonApiRoute => "http://localhost:5678/api/v1/";
         public static string PersonApiToken => "sdjkhfgsdkjfgsdjfgh";
@@ -58,6 +59,8 @@ namespace TenureListener.Tests.E2ETests.Fixtures
 
         private void StartPersonApiStub()
         {
+            CallsMade = 0;
+
             Environment.SetEnvironmentVariable("PersonApiUrl", PersonApiRoute);
             Environment.SetEnvironmentVariable("PersonApiToken", PersonApiToken);
             Task.Run(() =>
@@ -68,6 +71,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
 
                 // GetContext method blocks while waiting for a request. 
                 HttpListenerContext context = _httpListener.GetContext();
+                CallsMade++;
                 HttpListenerResponse response = context.Response;
 
                 if (context.Request.Headers["Authorization"] != PersonApiToken)

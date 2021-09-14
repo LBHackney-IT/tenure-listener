@@ -43,8 +43,4 @@
       <EmbeddedResource Remove="TestResults\**" />
       <None Remove="TestResults\**" />
   </ItemGroup>
-    
-  <ItemGroup>
-    <Folder Include="Factories\" />
-  </ItemGroup>
 </Project>

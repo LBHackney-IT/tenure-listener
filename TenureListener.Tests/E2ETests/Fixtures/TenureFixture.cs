@@ -66,6 +66,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
                 tenure.HouseholdMembers.Last().Id = personId.Value;
 
             _dbContext.SaveAsync<TenureInformationDb>(tenure).GetAwaiter().GetResult();
+            tenure.VersionNumber = 0;
             return tenure;
         }
 
