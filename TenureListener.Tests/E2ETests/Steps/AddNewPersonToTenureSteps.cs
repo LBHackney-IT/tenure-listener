@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 using TenureListener.Domain.Person;
 using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;

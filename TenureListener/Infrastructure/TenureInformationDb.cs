@@ -2,7 +2,7 @@ using Amazon.DynamoDBv2.DataModel;
 using Hackney.Core.DynamoDb.Converters;
 using System;
 using System.Collections.Generic;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 
 namespace TenureListener.Infrastructure
 {
@@ -22,14 +22,11 @@ namespace TenureListener.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<TenuredAsset>))]
         public TenuredAsset TenuredAsset { get; set; }
 
-        [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<AccountType>))]
-        public AccountType AccountType { get; set; }
-
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Charges>))]
         public Charges Charges { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime StartOfTenureDate { get; set; }
+        public DateTime? StartOfTenureDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
         public DateTime? EndOfTenureDate { get; set; }
@@ -38,28 +35,22 @@ namespace TenureListener.Infrastructure
         public TenureType TenureType { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
-        public bool IsTenanted { get; set; }
+        public bool? IsTenanted { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<Terminated>))]
         public Terminated Terminated { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime SuccessionDate { get; set; }
+        public DateTime? SuccessionDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectConverter<AgreementType>))]
         public AgreementType AgreementType { get; set; }
 
-        [DynamoDBProperty]
-        public List<string> SubsidiaryAccountsReferences { get; set; } = new List<string>();
-
-        [DynamoDBProperty]
-        public string MasterAccountTenureReference { get; set; }
+        [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
+        public DateTime? EvictionDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime EvictionDate { get; set; }
-
-        [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime PotentialEndDate { get; set; }
+        public DateTime? PotentialEndDate { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<Notices>))]
         public List<Notices> Notices { get; set; } = new List<Notices>();
@@ -67,20 +58,17 @@ namespace TenureListener.Infrastructure
         [DynamoDBProperty(Converter = typeof(DynamoDbObjectListConverter<LegacyReference>))]
         public List<LegacyReference> LegacyReferences { get; set; } = new List<LegacyReference>();
 
-        [DynamoDBProperty]
-        public string RentCostCentre { get; set; }
+        [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
+        public bool? IsMutualExchange { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
-        public bool IsMutualExchange { get; set; }
+        public bool? InformHousingBenefitsForChanges { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
-        public bool InformHousingBenefitsForChanges { get; set; }
-
-        [DynamoDBProperty(Converter = typeof(DynamoDbBoolConverter))]
-        public bool IsSublet { get; set; }
+        public bool? IsSublet { get; set; }
 
         [DynamoDBProperty(Converter = typeof(DynamoDbDateTimeConverter))]
-        public DateTime SubletEndDate { get; set; }
+        public DateTime? SubletEndDate { get; set; }
 
         [DynamoDBVersion]
         public int? VersionNumber { get; set; }

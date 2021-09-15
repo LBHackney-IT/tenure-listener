@@ -1,6 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 using TenureListener.Factories;
 using TenureListener.Infrastructure;
 using Xunit;

@@ -3,7 +3,7 @@ using Hackney.Core.Logging;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 using TenureListener.Factories;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.Infrastructure;

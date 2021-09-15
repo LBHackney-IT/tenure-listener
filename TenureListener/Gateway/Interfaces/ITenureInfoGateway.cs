@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 
 namespace TenureListener.Gateway.Interfaces
 {

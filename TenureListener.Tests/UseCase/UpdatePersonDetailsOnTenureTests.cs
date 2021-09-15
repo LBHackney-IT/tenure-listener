@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
+using Hackney.Shared.Tenure;
 using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.Infrastructure.Exceptions;
