@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
+using TenureListener.Factories;
 using TenureListener.Gateway;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.UseCase;
@@ -88,24 +89,12 @@ namespace TenureListener
             {
                 try
                 {
-                    IMessageProcessing processor = null;
-                    switch (entityEvent.EventType)
-                    {
-                        case EventTypes.PersonCreatedEvent:
-                            {
-                                processor = ServiceProvider.GetService<IAddNewPersonToTenure>();
-                                break;
-                            }
-                        case EventTypes.PersonUpdatedEvent:
-                            {
-                                processor = ServiceProvider.GetService<IUpdatePersonDetailsOnTenure>();
-                                break;
-                            }
-                        default:
-                            throw new ArgumentException($"Unknown event type: {entityEvent.EventType} on message id: {message.MessageId}");
-                    }
-
-                    await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
+                    IMessageProcessing processor = entityEvent.CreateUseCaseForMessage(ServiceProvider);
+                    if (processor != null)
+                        await processor.ProcessMessageAsync(entityEvent).ConfigureAwait(false);
+                    else
+                        Logger.LogInformation($"No processors available for message so it will be ignored. " +
+                            $"Message id: {message.MessageId}; type: {entityEvent.EventType}; version: {entityEvent.Version}");
                 }
                 catch (Exception ex)
                 {

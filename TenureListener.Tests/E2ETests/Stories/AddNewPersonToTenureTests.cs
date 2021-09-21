@@ -95,5 +95,16 @@ namespace TenureListener.Tests.E2ETests.Stories
                 .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(PersonApiFixture.PersonResponse.Tenures.First().Id))
                 .BDDfy();
         }
+
+        [Fact]
+        public void ListenerDoesNothingForV2Message()
+        {
+            var personId = Guid.NewGuid();
+            this.Given(g => _personApiFixture.GivenThePersonExists(personId, PersonType.Tenant))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id, false))
+                .When(w => _steps.WhenTheFunctionIsTriggered(personId, EventVersions.V2))
+                .Then(t => _steps.ThenTheEventIsIgnored(PersonApiFixture.CallsMade, _tenureFixture.Tenure, _dbFixture.DynamoDbContext))
+                .BDDfy();
+        }
     }
 }
