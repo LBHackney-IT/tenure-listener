@@ -107,4 +107,3 @@ module "tenure_listener_cw_dashboard" {
   sqs_queue_name             = aws_sqs_queue.tenure_queue.name
   sqs_dead_letter_queue_name = aws_sqs_queue.tenure_dead_letter_queue.name
 }
-

@@ -27,11 +27,12 @@ namespace TenureListener.Tests.E2ETests.Steps
         public AddNewPersonToTenureSteps()
         { }
 
-        private SQSEvent.SQSMessage CreateMessage(Guid personId, string eventType = EventTypes.PersonCreatedEvent)
+        private SQSEvent.SQSMessage CreateMessage(Guid personId, string eventVersion = EventVersions.V1)
         {
             var personSns = _fixture.Build<EntityEventSns>()
                                     .With(x => x.EntityId, personId)
-                                    .With(x => x.EventType, eventType)
+                                    .With(x => x.EventType, EventTypes.PersonCreatedEvent)
+                                    .With(x => x.Version, eventVersion)
                                     .Create();
 
             var msgBody = JsonSerializer.Serialize(personSns, _jsonOptions);
@@ -43,6 +44,10 @@ namespace TenureListener.Tests.E2ETests.Steps
 
         public async Task WhenTheFunctionIsTriggered(Guid personId)
         {
+            await WhenTheFunctionIsTriggered(personId, EventVersions.V1);
+        }
+        public async Task WhenTheFunctionIsTriggered(Guid personId, string eventVersion)
+        {
             var mockLambdaLogger = new Mock<ILambdaLogger>();
             ILambdaContext lambdaContext = new TestLambdaContext()
             {
@@ -50,7 +55,7 @@ namespace TenureListener.Tests.E2ETests.Steps
             };
 
             var sqsEvent = _fixture.Build<SQSEvent>()
-                                   .With(x => x.Records, new List<SQSEvent.SQSMessage> { CreateMessage(personId) })
+                                   .With(x => x.Records, new List<SQSEvent.SQSMessage> { CreateMessage(personId, eventVersion) })
                                    .Create();
 
             Func<Task> func = async () =>
@@ -97,6 +102,15 @@ namespace TenureListener.Tests.E2ETests.Steps
             _lastException.Should().NotBeNull();
             _lastException.Should().BeOfType(typeof(TenureNotFoundException));
             (_lastException as TenureNotFoundException).Id.Should().Be(tenureId);
+        }
+
+        public async Task ThenTheEventIsIgnored(int personApiCallsMade, TenureInformationDb tenure, IDynamoDBContext dbContext)
+        {
+            _lastException.Should().BeNull();
+            personApiCallsMade.Should().Be(0);
+
+            var tenureInDb = await dbContext.LoadAsync<TenureInformationDb>(tenure.Id);
+            tenureInDb.Should().BeEquivalentTo(tenure);
         }
     }
 }
