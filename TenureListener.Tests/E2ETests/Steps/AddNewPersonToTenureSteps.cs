@@ -23,6 +23,7 @@ namespace TenureListener.Tests.E2ETests.Steps
     {
         private readonly Fixture _fixture = new Fixture();
         private Exception _lastException;
+        protected readonly Guid _correlationId = Guid.NewGuid();
 
         public AddNewPersonToTenureSteps()
         { }
@@ -33,6 +34,7 @@ namespace TenureListener.Tests.E2ETests.Steps
                                     .With(x => x.EntityId, personId)
                                     .With(x => x.EventType, EventTypes.PersonCreatedEvent)
                                     .With(x => x.Version, eventVersion)
+                                    .With(x => x.CorrelationId, _correlationId)
                                     .Create();
 
             var msgBody = JsonSerializer.Serialize(personSns, _jsonOptions);
@@ -65,6 +67,11 @@ namespace TenureListener.Tests.E2ETests.Steps
             };
 
             _lastException = await Record.ExceptionAsync(func);
+        }
+
+        public void ThenTheCorrleationIdWasUsedInTheApiCall(string receivedCorrelationId)
+        {
+            receivedCorrelationId.Should().Be(_correlationId.ToString());
         }
 
         public async Task ThenTheTenureIsUpdatedWithTheUserDetails(

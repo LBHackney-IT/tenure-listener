@@ -55,6 +55,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonDoesNotExist(personId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
                 .Then(t => _steps.ThenAPersonNotFoundExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -66,6 +67,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExists(personId))
                 .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
                 .Then(t => _steps.ThenNoChangesAreMade(_dbFixture.DynamoDbContext, _tenureFixture.Tenure))
                 .BDDfy();
         }
@@ -77,6 +79,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExistsWithMultipleTenures(personId, 5))
                 .And(h => _tenureFixture.GivenTenuresAlreadyExist(PersonApiFixture.PersonResponse, false))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
                 .Then(t => _steps.ThenNoChangesAreMade(_dbFixture.DynamoDbContext, _tenureFixture.Tenures.ToArray()))
                 .BDDfy();
         }
@@ -88,6 +91,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExistsWithMultipleTenures(personId, 5))
                 .And(h => _tenureFixture.GivenTenuresAlreadyExist(PersonApiFixture.PersonResponse, true))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
+                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
                 .Then(t => _steps.ThenAllTenuresAreUpdated(_dbFixture.DynamoDbContext, PersonApiFixture.PersonResponse))
                 .BDDfy();
         }
