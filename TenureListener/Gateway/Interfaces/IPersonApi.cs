@@ -6,6 +6,6 @@ namespace TenureListener.Gateway.Interfaces
 {
     public interface IPersonApi
     {
-        Task<PersonResponseObject> GetPersonByIdAsync(Guid id);
+        Task<PersonResponseObject> GetPersonByIdAsync(Guid id, Guid correlationId);
     }
 }

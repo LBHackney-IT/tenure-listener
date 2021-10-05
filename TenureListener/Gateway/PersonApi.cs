@@ -47,11 +47,12 @@ namespace TenureListener.Gateway
         }
 
         [LogCall]
-        public async Task<PersonResponseObject> GetPersonByIdAsync(Guid id)
+        public async Task<PersonResponseObject> GetPersonByIdAsync(Guid id, Guid correlationId)
         {
             var client = _httpClientFactory.CreateClient();
             var getPersonRoute = $"{_getPersonApiRoute}/persons/{id}";
 
+            client.DefaultRequestHeaders.Add("x-correlation-id", correlationId.ToString());
             client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(_getPersonApiToken);
             var response = await client.GetAsync(new Uri(getPersonRoute))
                                        .ConfigureAwait(false);

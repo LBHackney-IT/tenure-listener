@@ -5,6 +5,7 @@ using Moq;
 using Moq.Protected;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -28,6 +29,7 @@ namespace TenureListener.Tests.Gateway
         private IConfiguration _configuration;
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
+        private static readonly Guid _correlationId = Guid.NewGuid();
         private const string PersonApiRoute = "https://some-domain.com/api/";
         private const string PersonApiToken = "dksfghjskueygfakseygfaskjgfsdjkgfdkjsgfdkjgf";
 
@@ -65,8 +67,10 @@ namespace TenureListener.Tests.Gateway
 
         private static bool ValidateRequest(string expectedRoute, HttpRequestMessage request)
         {
+            var correlationIdHeader = request.Headers.GetValues("x-correlation-id")?.FirstOrDefault();
             return (request.RequestUri.ToString() == expectedRoute)
-                && (request.Headers.Authorization.ToString() == PersonApiToken);
+                && (request.Headers.Authorization.ToString() == PersonApiToken)
+                && (correlationIdHeader == _correlationId.ToString());
         }
 
         private void SetupHttpClientResponse(string route, PersonResponseObject response)
@@ -151,7 +155,7 @@ namespace TenureListener.Tests.Gateway
             SetupHttpClientException(Route(id), new Exception(exMessage));
 
             Func<Task<PersonResponseObject>> func =
-                async () => await _sut.GetPersonByIdAsync(id).ConfigureAwait(false);
+                async () => await _sut.GetPersonByIdAsync(id, _correlationId).ConfigureAwait(false);
 
             func.Should().ThrowAsync<Exception>().WithMessage(exMessage);
         }
@@ -164,7 +168,7 @@ namespace TenureListener.Tests.Gateway
             SetupHttpClientErrorResponse(Route(id), error);
 
             Func<Task<PersonResponseObject>> func =
-                async () => await _sut.GetPersonByIdAsync(id).ConfigureAwait(false);
+                async () => await _sut.GetPersonByIdAsync(id, _correlationId).ConfigureAwait(false);
 
             func.Should().ThrowAsync<GetPersonException>()
                          .WithMessage($"Failed to get person details for id {id}. " +
@@ -177,7 +181,7 @@ namespace TenureListener.Tests.Gateway
             var id = Guid.NewGuid();
             SetupHttpClientResponse(Route(id), null);
 
-            var result = await _sut.GetPersonByIdAsync(id).ConfigureAwait(false);
+            var result = await _sut.GetPersonByIdAsync(id, _correlationId).ConfigureAwait(false);
 
             result.Should().BeNull();
         }
@@ -189,7 +193,7 @@ namespace TenureListener.Tests.Gateway
             var person = new Fixture().Create<PersonResponseObject>();
             SetupHttpClientResponse(Route(id), person);
 
-            var result = await _sut.GetPersonByIdAsync(id).ConfigureAwait(false);
+            var result = await _sut.GetPersonByIdAsync(id, _correlationId).ConfigureAwait(false);
 
             result.Should().BeEquivalentTo(person);
         }
