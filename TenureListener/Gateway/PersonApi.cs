@@ -1,4 +1,5 @@
 using Hackney.Core.Logging;
+using Hackney.Shared.Person.Boundary.Response;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net;
@@ -7,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
 using TenureListener.Infrastructure.Exceptions;
 

@@ -1,4 +1,6 @@
 using AutoFixture;
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Person.Domain;
 using System;
 using System.IO;
 using System.Linq;
@@ -6,7 +8,6 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using TenureListener.Domain.Person;
 
 namespace TenureListener.Tests.E2ETests.Fixtures
 {
@@ -116,7 +117,7 @@ namespace TenureListener.Tests.E2ETests.Fixtures
                                       .With(x => x.Id, personId)
                                       .With(x => x.PersonTypes, new PersonType[] { personType })
                                       .With(x => x.DateOfBirth, DateTime.UtcNow.AddYears(-30).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffZ"))
-                                      .With(x => x.Tenures, _fixture.CreateMany<Tenure>(numberOfTenures))
+                                      .With(x => x.Tenures, _fixture.CreateMany<TenureResponseObject>(numberOfTenures))
                                       .Create();
             return PersonResponse;
         }
