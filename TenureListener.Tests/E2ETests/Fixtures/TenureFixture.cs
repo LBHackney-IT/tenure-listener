@@ -1,10 +1,10 @@
 using Amazon.DynamoDBv2.DataModel;
 using AutoFixture;
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Tenure.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TenureListener.Domain.Person;
-using TenureListener.Infrastructure;
 
 namespace TenureListener.Tests.E2ETests.Fixtures
 {

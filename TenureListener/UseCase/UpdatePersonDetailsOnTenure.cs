@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase.Interfaces;
 
@@ -57,10 +58,10 @@ namespace TenureListener.UseCase
 
                     var personDoB = DateTime.Parse(person.DateOfBirth);
                     // Only bother if these details (name and date of birth) have changed...
-                    if ((person.FullName != tenureHouseholdMember.FullName)
+                    if ((person.GetFullName() != tenureHouseholdMember.FullName)
                         || (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date))
                     {
-                        tenureHouseholdMember.FullName = person.FullName;
+                        tenureHouseholdMember.FullName = person.GetFullName();
                         tenureHouseholdMember.DateOfBirth = personDoB;
 
                         await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);

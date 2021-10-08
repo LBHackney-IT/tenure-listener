@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.Person.Boundary.Response;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
@@ -12,7 +13,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using TenureListener.Domain.Person;
 using TenureListener.Gateway;
 using TenureListener.Infrastructure.Exceptions;
 using Xunit;

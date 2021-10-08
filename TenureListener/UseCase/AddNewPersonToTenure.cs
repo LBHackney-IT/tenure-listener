@@ -1,10 +1,11 @@
+using Hackney.Shared.Person.Domain;
+using Hackney.Shared.Tenure.Domain;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
-using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase.Interfaces;
 
@@ -48,7 +49,7 @@ namespace TenureListener.UseCase
             {
                 Id = person.Id,
                 Type = HouseholdMembersType.Person,
-                FullName = person.FullName,
+                FullName = person.GetFullName(),
                 DateOfBirth = DateTime.Parse(person.DateOfBirth),
                 PersonTenureType = tenure.TenureType.GetPersonTenureType(isResponsible),
                 IsResponsible = isResponsible

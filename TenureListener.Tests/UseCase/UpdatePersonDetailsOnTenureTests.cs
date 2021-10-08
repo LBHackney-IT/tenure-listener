@@ -1,5 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Tenure.Domain;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -7,9 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
-using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase;
 using Xunit;
@@ -48,7 +49,7 @@ namespace TenureListener.Tests.UseCase
 
         private PersonResponseObject CreatePerson(Guid entityId)
         {
-            var tenures = _fixture.CreateMany<Tenure>(1);
+            var tenures = _fixture.CreateMany<TenureResponseObject>(1);
             return _fixture.Build<PersonResponseObject>()
                            .With(x => x.Id, entityId)
                            .With(x => x.Tenures, tenures)
@@ -61,7 +62,7 @@ namespace TenureListener.Tests.UseCase
             var householdMembers = _fixture.Build<HouseholdMembers>()
                                            .With(x => x.Id, person.Id)
                                            .With(x => x.DateOfBirth, DateTime.Parse(person.DateOfBirth))
-                                           .With(x => x.FullName, person.FullName)
+                                           .With(x => x.FullName, person.GetFullName())
                                            .CreateMany(1);
             return _fixture.Build<TenureInformation>()
                            .With(x => x.Id, entityId)
@@ -80,7 +81,7 @@ namespace TenureListener.Tests.UseCase
         private bool VerifyUpdatedTenure(TenureInformation updated, PersonResponseObject person)
         {
             var hm = updated.HouseholdMembers.First(x => x.Id == person.Id);
-            hm.FullName.Should().Be(person.FullName);
+            hm.FullName.Should().Be(person.GetFullName());
             hm.DateOfBirth.Should().Be(DateTime.Parse(person.DateOfBirth));
             return true;
         }
@@ -129,7 +130,7 @@ namespace TenureListener.Tests.UseCase
         [Fact]
         public async Task ProcessMessageAsyncTestPersonHasNoTenuresDoesNothing()
         {
-            _person.Tenures = Enumerable.Empty<Tenure>();
+            _person.Tenures = Enumerable.Empty<TenureResponseObject>();
             _mockPersonApi.Setup(x => x.GetPersonByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_person);
 
@@ -255,7 +256,7 @@ namespace TenureListener.Tests.UseCase
         public async Task ProcessMessageAsyncTestManyTenuresUpdatedWithChanges()
         {
             int numTenures = 5;
-            _person.Tenures = _fixture.CreateMany<Tenure>(numTenures);
+            _person.Tenures = _fixture.CreateMany<TenureResponseObject>(numTenures);
             var tenures = new List<TenureInformation>();
             foreach (var personTenure in _person.Tenures)
             {

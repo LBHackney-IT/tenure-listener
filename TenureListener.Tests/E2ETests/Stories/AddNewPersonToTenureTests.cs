@@ -1,6 +1,6 @@
+using Hackney.Shared.Person.Domain;
 using System;
 using System.Linq;
-using TenureListener.Domain.Person;
 using TenureListener.Tests.E2ETests.Fixtures;
 using TenureListener.Tests.E2ETests.Steps;
 using TestStack.BDDfy;

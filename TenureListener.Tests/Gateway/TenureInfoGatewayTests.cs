@@ -1,15 +1,15 @@
 using Amazon.DynamoDBv2.DataModel;
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.Tenure.Domain;
+using Hackney.Shared.Tenure.Factories;
+using Hackney.Shared.Tenure.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TenureListener.Domain;
-using TenureListener.Factories;
 using TenureListener.Gateway;
-using TenureListener.Infrastructure;
 using Xunit;
 
 namespace TenureListener.Tests.Gateway
@@ -118,10 +118,8 @@ namespace TenureListener.Tests.Gateway
             await InsertDatatoDynamoDB(tenure).ConfigureAwait(false);
 
             tenure.HouseholdMembers = _fixture.CreateMany<HouseholdMembers>(5);
-            tenure.AccountType = _fixture.Create<AccountType>();
             tenure.IsMutualExchange = !tenure.IsMutualExchange;
             tenure.IsSublet = !tenure.IsSublet;
-            tenure.RentCostCentre = "Some new cost centre";
             tenure.VersionNumber = 0; // This will have been set when injecting the inital record.
 
             await _classUnderTest.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
