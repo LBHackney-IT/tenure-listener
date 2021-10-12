@@ -17,7 +17,7 @@ namespace Hackney.Core.Testing.Shared.E2E
         public List<string> ReceivedCorrelationIds { get; protected set; } = new List<string>();
         public string ApiRoute { get; protected set; }
         public string ApiToken { get; protected set; }
-        public Dictionary<string,T> Responses { get; protected set; } = new Dictionary<string, T>();
+        public Dictionary<string, T> Responses { get; protected set; } = new Dictionary<string, T>();
         public int CallsMade { get; private set; }
 
         public BaseApiFixture(string route, string token)
@@ -90,7 +90,7 @@ namespace Hackney.Core.Testing.Shared.E2E
                         if (Responses.Any())
                         {
                             var requestedId = context.Request.Url.Segments.Last();
-                            thisResponse = Responses.ContainsKey(requestedId)? Responses[requestedId] : null;
+                            thisResponse = Responses.ContainsKey(requestedId) ? Responses[requestedId] : null;
                         }
 
                         response.StatusCode = (int) ((thisResponse is null) ? HttpStatusCode.NotFound : HttpStatusCode.OK);

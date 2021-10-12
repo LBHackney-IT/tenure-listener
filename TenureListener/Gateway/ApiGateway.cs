@@ -18,7 +18,7 @@ namespace TenureListener.Gateway
     public class ApiGateway : IApiGateway
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;        
+        private readonly IConfiguration _configuration;
         private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
 
         public string ApiRoute { get; private set; }
