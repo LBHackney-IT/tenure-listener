@@ -18,6 +18,7 @@ namespace Hackney.Core.Testing.Shared.E2E
         public string ApiRoute { get; protected set; }
         public string ApiToken { get; protected set; }
         public Dictionary<string,T> Responses { get; protected set; } = new Dictionary<string, T>();
+        public int CallsMade { get; private set; }
 
         public BaseApiFixture(string route, string token)
         {
@@ -62,6 +63,7 @@ namespace Hackney.Core.Testing.Shared.E2E
 
         private void StartApiStub()
         {
+            CallsMade = 0;
             ReceivedCorrelationIds.Clear();
 
             Task.Run(() =>
@@ -74,6 +76,7 @@ namespace Hackney.Core.Testing.Shared.E2E
                 while (true)
                 {
                     HttpListenerContext context = _httpListener.GetContext();
+                    CallsMade++;
                     HttpListenerResponse response = context.Response;
 
                     if (context.Request.Headers["Authorization"] != ApiToken)
