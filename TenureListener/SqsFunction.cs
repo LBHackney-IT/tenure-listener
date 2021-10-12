@@ -54,8 +54,11 @@ namespace TenureListener
             services.AddHttpClient();
             services.AddScoped<IAddNewPersonToTenure, AddNewPersonToTenure>();
             services.AddScoped<IUpdatePersonDetailsOnTenure, UpdatePersonDetailsOnTenure>();
+            services.AddScoped<IUpdateAccountDetailsOnTenure, UpdateAccountDetailsOnTenure>();
 
             services.AddScoped<IPersonApi, PersonApi>();
+            services.AddScoped<IApiGateway, ApiGateway>();
+            services.AddScoped<IAccountApi, AccountApi>();
             services.AddScoped<ITenureInfoGateway, TenureInfoGateway>();
 
             base.ConfigureServices(services);
