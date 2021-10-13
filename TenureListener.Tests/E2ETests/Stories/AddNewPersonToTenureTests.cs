@@ -60,7 +60,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, personType))
                 .And(h => _tenureFixture.GivenATenureAlreadyExists(_personApiFixture.ResponseObject.Tenures.First().Id, nullTenuredAssetType))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenTheTenureIsUpdatedWithTheUserDetails(
                                     _personApiFixture.ResponseObject, _dbFixture.DynamoDbContext))
                 .BDDfy();
@@ -72,7 +72,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonDoesNotExist(personId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenAPersonNotFoundExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -83,7 +83,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, false))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenAPersonHasNoTenuresExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -95,7 +95,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             this.Given(g => _personApiFixture.GivenThePersonExists(personId))
                 .And(h => _tenureFixture.GivenATenureDoesNotExist(_personApiFixture.ResponseObject.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(_personApiFixture.ResponseObject.Tenures.First().Id))
                 .BDDfy();
         }

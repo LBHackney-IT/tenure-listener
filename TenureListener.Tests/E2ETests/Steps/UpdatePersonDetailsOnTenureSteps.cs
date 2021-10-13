@@ -94,7 +94,7 @@ namespace TenureListener.Tests.E2ETests.Steps
             }
         }
 
-        public void ThenTheCorrleationIdWasUsedInTheApiCall(string receivedCorrelationId)
+        public void ThenTheCorrelationIdWasUsedInTheApiCall(string receivedCorrelationId)
         {
             receivedCorrelationId.Should().Be(_correlationId.ToString());
         }

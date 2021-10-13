@@ -71,7 +71,7 @@ namespace TenureListener.Tests.E2ETests.Steps
             tenureInfo.PaymentReference.Should().Be(accountResponse.PaymentReference);
         }
 
-        public void ThenTheCorrleationIdWasUsedInTheApiCall(string receivedCorrelationId)
+        public void ThenTheCorrelationIdWasUsedInTheApiCall(string receivedCorrelationId)
         {
             receivedCorrelationId.Should().Be(_correlationId.ToString());
         }

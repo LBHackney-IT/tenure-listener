@@ -57,9 +57,12 @@ namespace TenureListener
             services.AddScoped<IUpdateAccountDetailsOnTenure, UpdateAccountDetailsOnTenure>();
 
             services.AddScoped<IPersonApi, PersonApi>();
-            services.AddScoped<IApiGateway, ApiGateway>();
             services.AddScoped<IAccountApi, AccountApi>();
             services.AddScoped<ITenureInfoGateway, TenureInfoGateway>();
+
+            // Transient because otherwise all gateway's that use it will get the same instance,
+            // which is not the desired result.
+            services.AddTransient<IApiGateway, ApiGateway>();
 
             base.ConfigureServices(services);
         }

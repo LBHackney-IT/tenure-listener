@@ -23,7 +23,6 @@ namespace TenureListener.Tests.UseCase
     {
         private readonly Mock<IAccountApi> _mockAccountApi;
         private readonly Mock<ITenureInfoGateway> _mockGateway;
-        private readonly Mock<ILogger<UpdateAccountDetailsOnTenure>> _mockLogger;
         private readonly UpdateAccountDetailsOnTenure _sut;
 
         private readonly EntityEventSns _message;
@@ -40,8 +39,7 @@ namespace TenureListener.Tests.UseCase
 
             _mockAccountApi = new Mock<IAccountApi>();
             _mockGateway = new Mock<ITenureInfoGateway>();
-            _mockLogger = new Mock<ILogger<UpdateAccountDetailsOnTenure>>();
-            _sut = new UpdateAccountDetailsOnTenure(_mockAccountApi.Object, _mockGateway.Object, _mockLogger.Object);
+            _sut = new UpdateAccountDetailsOnTenure(_mockAccountApi.Object, _mockGateway.Object);
 
             _message = CreateMessage();
             _account = CreateAccount(_message.EntityId);
@@ -159,7 +157,6 @@ namespace TenureListener.Tests.UseCase
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
             _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
-            _mockLogger.VerifyAny(LogLevel.Warning, Times.Never());
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.IsAny<TenureInformation>()), Times.Never);
         }
 
@@ -179,7 +176,6 @@ namespace TenureListener.Tests.UseCase
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
             _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
-            _mockLogger.VerifyAny(LogLevel.Warning, Times.Never());
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.Is<TenureInformation>(y => VerifyUpdatedTenure(y, _account))),
                                 Times.Once);
         }
@@ -196,7 +192,6 @@ namespace TenureListener.Tests.UseCase
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
             _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
-            _mockLogger.VerifyAny(LogLevel.Warning, Times.Never());
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.Is<TenureInformation>(y => VerifyUpdatedTenure(y, _account))),
                                 Times.Once);
         }

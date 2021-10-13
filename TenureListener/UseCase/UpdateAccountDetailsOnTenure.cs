@@ -12,14 +12,11 @@ namespace TenureListener.UseCase
     {
         private readonly IAccountApi _accountApi;
         private readonly ITenureInfoGateway _gateway;
-        private readonly ILogger<UpdateAccountDetailsOnTenure> _logger;
 
-        public UpdateAccountDetailsOnTenure(IAccountApi personApi, ITenureInfoGateway gateway,
-            ILogger<UpdateAccountDetailsOnTenure> logger)
+        public UpdateAccountDetailsOnTenure(IAccountApi personApi, ITenureInfoGateway gateway)
         {
             _accountApi = personApi;
             _gateway = gateway;
-            _logger = logger;
         }
 
         public async Task ProcessMessageAsync(EntityEventSns message)
