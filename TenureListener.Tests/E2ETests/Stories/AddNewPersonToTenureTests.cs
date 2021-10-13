@@ -58,11 +58,11 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, personType))
-                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id, nullTenuredAssetType))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(_personApiFixture.ResponseObject.Tenures.First().Id, nullTenuredAssetType))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenTheTenureIsUpdatedWithTheUserDetails(
-                                    PersonApiFixture.PersonResponse, _dbFixture.DynamoDbContext))
+                                    _personApiFixture.ResponseObject, _dbFixture.DynamoDbContext))
                 .BDDfy();
         }
 
@@ -72,7 +72,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonDoesNotExist(personId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenAPersonNotFoundExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -83,7 +83,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, false))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenAPersonHasNoTenuresExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -93,10 +93,10 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId))
-                .And(h => _tenureFixture.GivenATenureDoesNotExist(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .And(h => _tenureFixture.GivenATenureDoesNotExist(_personApiFixture.ResponseObject.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
-                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenATenureNotFoundExceptionIsThrown(_personApiFixture.ResponseObject.Tenures.First().Id))
                 .BDDfy();
         }
 
@@ -105,9 +105,9 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId, PersonType.Tenant))
-                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id, false))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(_personApiFixture.ResponseObject.Tenures.First().Id, false))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId, EventVersions.V2))
-                .Then(t => _steps.ThenTheEventIsIgnored(PersonApiFixture.CallsMade, _tenureFixture.Tenure, _dbFixture.DynamoDbContext))
+                .Then(t => _steps.ThenTheEventIsIgnored(_personApiFixture.CallsMade, _tenureFixture.Tenure, _dbFixture.DynamoDbContext))
                 .BDDfy();
         }
     }

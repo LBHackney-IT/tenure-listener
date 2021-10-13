@@ -5,6 +5,7 @@ using Hackney.Shared.Tenure.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TenureListener.Domain.Account;
 
 namespace TenureListener.Tests.E2ETests.Fixtures
 {
@@ -48,9 +49,9 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             }
         }
 
-        private TenureInformationDb ConstructAndSaveTenure(Guid tenureId, bool nullTenuredAssetType, Guid? personId = null)
+        private TenureInformationDb ConstructTenure(Guid tenureId)
         {
-            var tenure = _fixture.Build<TenureInformationDb>()
+            return _fixture.Build<TenureInformationDb>()
                                  .With(x => x.Id, tenureId)
                                  .With(x => x.EndOfTenureDate, DateTime.UtcNow)
                                  .With(x => x.StartOfTenureDate, DateTime.UtcNow)
@@ -60,6 +61,12 @@ namespace TenureListener.Tests.E2ETests.Fixtures
                                  .With(x => x.EvictionDate, DateTime.UtcNow)
                                  .With(x => x.VersionNumber, (int?) null)
                                  .Create();
+        }
+
+        private TenureInformationDb ConstructAndSaveTenure(Guid tenureId, bool nullTenuredAssetType, Guid? personId = null)
+        {
+            var tenure = ConstructTenure(tenureId);
+
             if (nullTenuredAssetType)
                 tenure.TenuredAsset.Type = null;
             if (personId.HasValue)
@@ -68,6 +75,17 @@ namespace TenureListener.Tests.E2ETests.Fixtures
             _dbContext.SaveAsync<TenureInformationDb>(tenure).GetAwaiter().GetResult();
             tenure.VersionNumber = 0;
             return tenure;
+        }
+
+        public void GivenATenureAlreadyExistsWithPaymentRef(Guid tenureId, string paymentRef)
+        {
+            var tenure = ConstructTenure(tenureId);
+            tenure.PaymentReference = paymentRef;
+
+            _dbContext.SaveAsync<TenureInformationDb>(tenure).GetAwaiter().GetResult();
+            tenure.VersionNumber = 0;
+            Tenure = tenure;
+            TenureId = tenure.Id;
         }
 
         public void GivenATenureAlreadyExists(Guid tenureId)
