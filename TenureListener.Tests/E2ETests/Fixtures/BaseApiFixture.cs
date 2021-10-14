@@ -13,6 +13,7 @@ namespace Hackney.Core.Testing.Shared.E2E
     {
         protected readonly JsonSerializerOptions _jsonOptions;
         private HttpListener _httpListener;
+        public List<HttpListenerRequest> Requests { get; private set; } = new List<HttpListenerRequest>();
         public T ResponseObject { get; protected set; }
         public List<string> ReceivedCorrelationIds { get; protected set; } = new List<string>();
         public string ApiRoute { get; protected set; }
@@ -64,6 +65,7 @@ namespace Hackney.Core.Testing.Shared.E2E
         private void StartApiStub()
         {
             CallsMade = 0;
+            Requests.Clear();
             ReceivedCorrelationIds.Clear();
 
             Task.Run(() =>
@@ -77,6 +79,7 @@ namespace Hackney.Core.Testing.Shared.E2E
                 {
                     HttpListenerContext context = _httpListener.GetContext();
                     CallsMade++;
+                    Requests.Add(context.Request);
                     HttpListenerResponse response = context.Response;
 
                     if (context.Request.Headers["Authorization"] != ApiToken)

@@ -65,7 +65,7 @@ namespace TenureListener.Tests.E2ETests.Steps
         public async Task ThenTheTenureIsUpdatedWithTheAccountDetails(
             AccountResponseObject accountResponse, IDynamoDBContext dbContext)
         {
-            var tenureId = accountResponse.Tenure.TenancyId;
+            var tenureId = accountResponse.TargetId;
             var tenureInfo = await dbContext.LoadAsync<TenureInformationDb>(tenureId);
 
             tenureInfo.PaymentReference.Should().Be(accountResponse.PaymentReference);

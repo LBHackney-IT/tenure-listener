@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
@@ -28,15 +27,15 @@ namespace TenureListener.UseCase
                                            .ConfigureAwait(false);
             if (account is null) throw new AccountNotFoundException(message.EntityId);
 
-            // 2. For the tenure listed on the account...
+            // 2. For the tenure specified on the account (the targetId is the tenureId)
             //      * Get the tenure object
             //      * Update the payment reference field
             //      * Save the updated tenure object if anything changed
-            if (account.Tenure != null)
+            if (account.TargetId != Guid.Empty)
             {
-                var tenure = await _gateway.GetTenureInfoByIdAsync(account.Tenure.TenancyId)
+                var tenure = await _gateway.GetTenureInfoByIdAsync(account.TargetId)
                                            .ConfigureAwait(false);
-                if (tenure is null) throw new TenureNotFoundException(account.Tenure.TenancyId);
+                if (tenure is null) throw new TenureNotFoundException(account.TargetId);
 
                 if (tenure.PaymentReference != account.PaymentReference)
                 {

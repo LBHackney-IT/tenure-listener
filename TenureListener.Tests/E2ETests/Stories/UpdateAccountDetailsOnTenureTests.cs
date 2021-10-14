@@ -75,7 +75,7 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var accountId = Guid.NewGuid();
             this.Given(g => _accountApiFixture.GivenTheAccountExists(accountId))
-                .And(h => _tenureFixture.GivenATenureAlreadyExistsWithPaymentRef(_accountApiFixture.ResponseObject.Tenure.TenancyId,
+                .And(h => _tenureFixture.GivenATenureAlreadyExistsWithPaymentRef(_accountApiFixture.ResponseObject.TargetId,
                                                                                  _accountApiFixture.ResponseObject.PaymentReference))
                 .When(w => _steps.WhenTheFunctionIsTriggered(accountId))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_accountApiFixture.ReceivedCorrelationIds.First()))
@@ -88,7 +88,7 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var accountId = Guid.NewGuid();
             this.Given(g => _accountApiFixture.GivenTheAccountExists(accountId))
-                .And(h => _tenureFixture.GivenATenureAlreadyExists(_accountApiFixture.ResponseObject.Tenure.TenancyId))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(_accountApiFixture.ResponseObject.TargetId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(accountId))
                 .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_accountApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenTheTenureIsUpdatedWithTheAccountDetails(_accountApiFixture.ResponseObject, _dbFixture.DynamoDbContext))
