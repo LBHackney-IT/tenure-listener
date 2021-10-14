@@ -43,7 +43,7 @@ namespace TenureListener.Tests.UseCase
 
             _message = CreateMessage();
             _account = CreateAccount(_message.EntityId);
-            _tenure = CreateTenure(_account.Tenure.TenancyId);
+            _tenure = CreateTenure(_account.Tenure.TenureId);
         }
 
         private AccountResponseObject CreateAccount(Guid entityId)
@@ -106,7 +106,7 @@ namespace TenureListener.Tests.UseCase
         [Fact]
         public async Task ProcessMessageAsyncTestAccountHasNullTenureDoesNothing()
         {
-            _account.Tenure = null;
+            _account.TargetId = Guid.Empty;
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_account);
 
@@ -122,7 +122,7 @@ namespace TenureListener.Tests.UseCase
             var exMsg = "This is an new error";
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenureId))
                         .ThrowsAsync(new Exception(exMsg));
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
@@ -134,14 +134,14 @@ namespace TenureListener.Tests.UseCase
         {
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.TargetId))
                         .ReturnsAsync((TenureInformation) null);
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
             func.Should().ThrowAsync<TenureNotFoundException>();
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
-            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
+            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.TargetId), Times.Once);
         }
 
         [Fact]
@@ -149,14 +149,14 @@ namespace TenureListener.Tests.UseCase
         {
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                           .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.TargetId))
                         .ReturnsAsync(_tenure);
             _tenure.PaymentReference = _account.PaymentReference;
 
             await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
-            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
+            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.TargetId), Times.Once);
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.IsAny<TenureInformation>()), Times.Never);
         }
 
@@ -165,7 +165,7 @@ namespace TenureListener.Tests.UseCase
         {
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                           .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.TargetId))
                         .ReturnsAsync(_tenure);
             var exMsg = "This is the last error";
             _mockGateway.Setup(x => x.UpdateTenureInfoAsync(It.IsAny<TenureInformation>()))
@@ -175,7 +175,7 @@ namespace TenureListener.Tests.UseCase
             func.Should().ThrowAsync<Exception>().WithMessage(exMsg);
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
-            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
+            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.TargetId), Times.Once);
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.Is<TenureInformation>(y => VerifyUpdatedTenure(y, _account))),
                                 Times.Once);
         }
@@ -185,13 +185,13 @@ namespace TenureListener.Tests.UseCase
         {
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                           .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.TargetId))
                         .ReturnsAsync(_tenure);
 
             await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
 
             _mockAccountApi.Verify(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId), Times.Once);
-            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenancyId), Times.Once);
+            _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(_account.TargetId), Times.Once);
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.Is<TenureInformation>(y => VerifyUpdatedTenure(y, _account))),
                                 Times.Once);
         }
