@@ -43,7 +43,7 @@ namespace TenureListener.Tests.UseCase
 
             _message = CreateMessage();
             _account = CreateAccount(_message.EntityId);
-            _tenure = CreateTenure(_account.Tenure.TenureId);
+            _tenure = CreateTenure(_account.TargetId);
         }
 
         private AccountResponseObject CreateAccount(Guid entityId)
@@ -122,7 +122,7 @@ namespace TenureListener.Tests.UseCase
             var exMsg = "This is an new error";
             _mockAccountApi.Setup(x => x.GetAccountByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_account);
-            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.Tenure.TenureId))
+            _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(_account.TargetId))
                         .ThrowsAsync(new Exception(exMsg));
 
             Func<Task> func = async () => await _sut.ProcessMessageAsync(_message).ConfigureAwait(false);
