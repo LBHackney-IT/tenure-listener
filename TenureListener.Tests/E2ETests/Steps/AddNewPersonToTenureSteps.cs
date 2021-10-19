@@ -4,6 +4,10 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.Lambda.TestUtilities;
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Person.Domain;
+using Hackney.Shared.Tenure.Domain;
+using Hackney.Shared.Tenure.Infrastructure;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -11,8 +15,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
-using TenureListener.Domain.Person;
 using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;
 using Xunit;
@@ -69,7 +71,7 @@ namespace TenureListener.Tests.E2ETests.Steps
             _lastException = await Record.ExceptionAsync(func);
         }
 
-        public void ThenTheCorrleationIdWasUsedInTheApiCall(string receivedCorrelationId)
+        public void ThenTheCorrelationIdWasUsedInTheApiCall(string receivedCorrelationId)
         {
             receivedCorrelationId.Should().Be(_correlationId.ToString());
         }
@@ -82,7 +84,7 @@ namespace TenureListener.Tests.E2ETests.Steps
 
             var lastHouseholdMember = tenureInfo.HouseholdMembers.Last();
             lastHouseholdMember.Id.Should().Be(personResponse.Id);
-            lastHouseholdMember.FullName.Should().Be(personResponse.FullName);
+            lastHouseholdMember.FullName.Should().Be(personResponse.GetFullName());
             lastHouseholdMember.Type.Should().Be(HouseholdMembersType.Person);
             lastHouseholdMember.DateOfBirth.Should().Be(DateTime.Parse(personResponse.DateOfBirth));
             var isResponsible = personResponse.PersonTypes.First() == PersonType.Tenant;

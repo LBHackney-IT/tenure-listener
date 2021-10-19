@@ -1,6 +1,6 @@
-namespace TenureListener.Domain
+namespace TenureListener.Domain.Account
 {
-    public class AgreementType
+    public class AccountTenureType
     {
         public string Code { get; set; }
         public string Description { get; set; }

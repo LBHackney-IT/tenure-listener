@@ -1,6 +1,6 @@
+using Hackney.Shared.Person.Boundary.Response;
 using System;
 using System.Threading.Tasks;
-using TenureListener.Domain.Person;
 
 namespace TenureListener.Gateway.Interfaces
 {

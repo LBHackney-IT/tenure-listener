@@ -87,5 +87,12 @@ namespace TenureListener.Tests.Factories
             _event = ConstructEvent(EventTypes.PersonUpdatedEvent);
             TestMessageProcessingCreation<IUpdatePersonDetailsOnTenure>(_event);
         }
+
+        [Fact]
+        public void CreateUseCaseForMessageTestAccountCreatedEvent()
+        {
+            _event = ConstructEvent(EventTypes.AccountCreatedEvent);
+            TestMessageProcessingCreation<IUpdateAccountDetailsOnTenure>(_event);
+        }
     }
 }

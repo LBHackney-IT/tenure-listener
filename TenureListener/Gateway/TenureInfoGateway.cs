@@ -1,12 +1,12 @@
 using Amazon.DynamoDBv2.DataModel;
 using Hackney.Core.Logging;
+using Hackney.Shared.Tenure.Domain;
+using Hackney.Shared.Tenure.Factories;
+using Hackney.Shared.Tenure.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using TenureListener.Domain;
-using TenureListener.Factories;
 using TenureListener.Gateway.Interfaces;
-using TenureListener.Infrastructure;
 
 namespace TenureListener.Gateway
 {

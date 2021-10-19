@@ -55,7 +55,7 @@ namespace TenureListener.Tests.E2ETests.Stories
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonDoesNotExist(personId))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenAPersonNotFoundExceptionIsThrown(personId))
                 .BDDfy();
         }
@@ -65,9 +65,9 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExists(personId))
-                .And(h => _tenureFixture.GivenATenureAlreadyExists(PersonApiFixture.PersonResponse.Tenures.First().Id))
+                .And(h => _tenureFixture.GivenATenureAlreadyExists(_personApiFixture.ResponseObject.Tenures.First().Id))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenNoChangesAreMade(_dbFixture.DynamoDbContext, _tenureFixture.Tenure))
                 .BDDfy();
         }
@@ -77,9 +77,9 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExistsWithMultipleTenures(personId, 5))
-                .And(h => _tenureFixture.GivenTenuresAlreadyExist(PersonApiFixture.PersonResponse, false))
+                .And(h => _tenureFixture.GivenTenuresAlreadyExist(_personApiFixture.ResponseObject, false))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
                 .Then(t => _steps.ThenNoChangesAreMade(_dbFixture.DynamoDbContext, _tenureFixture.Tenures.ToArray()))
                 .BDDfy();
         }
@@ -89,10 +89,10 @@ namespace TenureListener.Tests.E2ETests.Stories
         {
             var personId = Guid.NewGuid();
             this.Given(g => _personApiFixture.GivenThePersonExistsWithMultipleTenures(personId, 5))
-                .And(h => _tenureFixture.GivenTenuresAlreadyExist(PersonApiFixture.PersonResponse, true))
+                .And(h => _tenureFixture.GivenTenuresAlreadyExist(_personApiFixture.ResponseObject, true))
                 .When(w => _steps.WhenTheFunctionIsTriggered(personId))
-                .Then(t => _steps.ThenTheCorrleationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationId))
-                .Then(t => _steps.ThenAllTenuresAreUpdated(_dbFixture.DynamoDbContext, PersonApiFixture.PersonResponse))
+                .Then(t => _steps.ThenTheCorrelationIdWasUsedInTheApiCall(_personApiFixture.ReceivedCorrelationIds.First()))
+                .Then(t => _steps.ThenAllTenuresAreUpdated(_dbFixture.DynamoDbContext, _personApiFixture.ResponseObject))
                 .BDDfy();
         }
     }

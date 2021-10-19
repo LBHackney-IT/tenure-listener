@@ -25,6 +25,10 @@ namespace TenureListener.Factories
                     processor = serviceProvider.GetService<IUpdatePersonDetailsOnTenure>();
                     break;
 
+                case EventTypes.AccountCreatedEvent:
+                    processor = serviceProvider.GetService<IUpdateAccountDetailsOnTenure>();
+                    break;
+
                 default:
                     throw new ArgumentException($"Unknown event type: {entityEvent.EventType}");
             }
