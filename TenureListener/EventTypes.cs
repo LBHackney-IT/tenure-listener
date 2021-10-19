@@ -4,5 +4,7 @@ namespace TenureListener
     {
         public const string PersonCreatedEvent = "PersonCreatedEvent";
         public const string PersonUpdatedEvent = "PersonUpdatedEvent";
+
+        public const string AccountCreatedEvent = "AccountCreatedEvent";
     }
 }

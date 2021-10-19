@@ -22,6 +22,8 @@ functions:
     environment:
       PersonApiUrl: ${ssm:/housing-tl/${self:provider.stage}/person-api-url}
       PersonApiToken: ${ssm:/housing-tl/${self:provider.stage}/person-api-token}
+      AccountApiUrl: ${ssm:/housing-finance/${self:provider.stage}/account-api-url}
+      AccountApiToken: ${ssm:/housing-finance/${self:provider.stage}/account-api-token}
     events:
       - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn} 
       

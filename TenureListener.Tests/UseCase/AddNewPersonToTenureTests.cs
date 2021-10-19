@@ -1,13 +1,15 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Person.Domain;
+using Hackney.Shared.Tenure.Domain;
 using Moq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TenureListener.Boundary;
-using TenureListener.Domain;
-using TenureListener.Domain.Person;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using TenureListener.Infrastructure.Exceptions;
 using TenureListener.UseCase;
 using Xunit;
@@ -43,7 +45,7 @@ namespace TenureListener.Tests.UseCase
 
         private PersonResponseObject CreatePerson(Guid entityId)
         {
-            var tenures = _fixture.CreateMany<Tenure>(1);
+            var tenures = _fixture.CreateMany<TenureResponseObject>(1);
             return _fixture.Build<PersonResponseObject>()
                            .With(x => x.Id, entityId)
                            .With(x => x.Tenures, tenures)
@@ -97,7 +99,7 @@ namespace TenureListener.Tests.UseCase
         [Fact]
         public void ProcessMessageAsyncTestPersonHasNoTenuresThrows()
         {
-            _person.Tenures = Enumerable.Empty<Tenure>();
+            _person.Tenures = Enumerable.Empty<TenureResponseObject>();
             _mockPersonApi.Setup(x => x.GetPersonByIdAsync(_message.EntityId, _message.CorrelationId))
                                        .ReturnsAsync(_person);
 
@@ -155,7 +157,6 @@ namespace TenureListener.Tests.UseCase
             _person.PersonTypes = new[] { personType };
             if (nullableEnums)
             {
-                _person.Gender = null;
                 _person.PreferredTitle = null;
             }
 
@@ -177,7 +178,7 @@ namespace TenureListener.Tests.UseCase
             {
                 Id = person.Id,
                 Type = HouseholdMembersType.Person,
-                FullName = person.FullName,
+                FullName = person.GetFullName(),
                 DateOfBirth = DateTime.Parse(person.DateOfBirth),
                 IsResponsible = isResponsible,
                 PersonTenureType = updated.TenureType.GetPersonTenureType(isResponsible)
