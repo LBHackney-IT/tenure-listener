@@ -99,11 +99,6 @@ namespace TenureListener.Tests.E2ETests.Steps
             receivedCorrelationId.Should().Be(_correlationId.ToString());
         }
 
-        public void ThenTheCorrleationIdWasUsedInTheApiCall(string receivedCorrelationId)
-        {
-            receivedCorrelationId.Should().Be(_correlationId.ToString());
-        }
-
         public void ThenAPersonNotFoundExceptionIsThrown(Guid tenureId)
         {
             _lastException.Should().NotBeNull();
