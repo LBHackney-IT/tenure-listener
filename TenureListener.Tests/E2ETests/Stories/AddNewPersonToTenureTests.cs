@@ -1,3 +1,4 @@
+using Hackney.Core.Testing.DynamoDb;
 using Hackney.Shared.Person.Domain;
 using System;
 using System.Linq;
@@ -12,18 +13,18 @@ namespace TenureListener.Tests.E2ETests.Stories
         AsA = "SQS Tenure Listener",
         IWant = "a function to process the person created message",
         SoThat = "The person details are set on the tenure")]
-    [Collection("Aws collection")]
+    [Collection("AppTest collection")]
     public class AddNewPersonToTenureTests : IDisposable
     {
-        private readonly AwsIntegrationTests _dbFixture;
+        private readonly IDynamoDbFixture _dbFixture;
         private readonly PersonApiFixture _personApiFixture;
         private readonly TenureFixture _tenureFixture;
 
         private readonly AddNewPersonToTenureSteps _steps;
 
-        public AddNewPersonToTenureTests(AwsIntegrationTests dbFixture)
+        public AddNewPersonToTenureTests(MockApplicationFactory appFactory)
         {
-            _dbFixture = dbFixture;
+            _dbFixture = appFactory.DynamoDbFixture;
 
             _personApiFixture = new PersonApiFixture();
             _tenureFixture = new TenureFixture(_dbFixture.DynamoDbContext);
