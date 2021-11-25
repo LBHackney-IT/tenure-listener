@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Core.Testing.Shared;
 using Hackney.Shared.Person.Boundary.Response;
 using Hackney.Shared.Tenure.Domain;
 using Microsoft.Extensions.Logging;

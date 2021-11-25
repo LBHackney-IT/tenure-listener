@@ -1,39 +1,37 @@
 using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
+using Hackney.Core.DynamoDb;
+using Hackney.Core.Testing.DynamoDb;
+using Hackney.Core.Testing.Shared;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
-using Xunit;
 
 namespace TenureListener.Tests
 {
-    public class AwsIntegrationTests
+    public class MockApplicationFactory
     {
-        public IDynamoDBContext DynamoDbContext => _factory?.DynamoDbContext;
-
-        private readonly AwsMockApplicationFactory _factory;
-        private readonly IHost _host;
-
         private readonly List<TableDef> _tables = new List<TableDef>
         {
             new TableDef { Name = "TenureInformation", KeyName = "id", KeyType = ScalarAttributeType.S }
         };
 
-        public AwsIntegrationTests()
+        public IDynamoDbFixture DynamoDbFixture { get; private set; }
+        private readonly IHost _host;
+
+        public MockApplicationFactory()
         {
             EnsureEnvVarConfigured("DynamoDb_LocalMode", "true");
             EnsureEnvVarConfigured("DynamoDb_LocalServiceUrl", "http://localhost:8000");
 
-            _factory = new AwsMockApplicationFactory(_tables);
-            _host = _factory.CreateHostBuilder(null).Build();
-            _host.Start();
-
-            LogCallAspectFixture.SetupLogCallAspect();
+            _host = CreateHostBuilder().Build();
         }
 
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         private bool _disposed;
@@ -41,11 +39,15 @@ namespace TenureListener.Tests
         {
             if (disposing && !_disposed)
             {
+                if (DynamoDbFixture != null)
+                    DynamoDbFixture.Dispose();
+
                 if (null != _host)
                 {
                     _host.StopAsync().GetAwaiter().GetResult();
                     _host.Dispose();
                 }
+
                 _disposed = true;
             }
         }
@@ -55,20 +57,20 @@ namespace TenureListener.Tests
             if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(name)))
                 Environment.SetEnvironmentVariable(name, defaultValue);
         }
-    }
 
-    public class TableDef
-    {
-        public string Name { get; set; }
-        public string KeyName { get; set; }
-        public ScalarAttributeType KeyType { get; set; }
-    }
+        public IHostBuilder CreateHostBuilder() => Host.CreateDefaultBuilder(null)
+           .ConfigureAppConfiguration(b => b.AddEnvironmentVariables())
+           .ConfigureServices((hostContext, services) =>
+           {
+               services.ConfigureDynamoDB();
+               services.ConfigureDynamoDbFixture();
 
-    [CollectionDefinition("Aws collection", DisableParallelization = true)]
-    public class AwsCollection : ICollectionFixture<AwsIntegrationTests>
-    {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
+               var serviceProvider = services.BuildServiceProvider();
+
+               LogCallAspectFixture.SetupLogCallAspect();
+
+               DynamoDbFixture = serviceProvider.GetRequiredService<IDynamoDbFixture>();
+               DynamoDbFixture.EnsureTablesExist(_tables);
+           });
     }
 }

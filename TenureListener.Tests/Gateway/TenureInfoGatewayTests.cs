@@ -1,6 +1,8 @@
 using Amazon.DynamoDBv2.DataModel;
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Core.Testing.DynamoDb;
+using Hackney.Core.Testing.Shared;
 using Hackney.Shared.Tenure.Domain;
 using Hackney.Shared.Tenure.Factories;
 using Hackney.Shared.Tenure.Infrastructure;
@@ -14,19 +16,19 @@ using Xunit;
 
 namespace TenureListener.Tests.Gateway
 {
-    [Collection("Aws collection")]
+    [Collection("AppTest collection")]
     public class TenureInfoGatewayTests : IDisposable
     {
         private readonly Fixture _fixture = new Fixture();
         private readonly Mock<ILogger<TenureInfoGateway>> _logger;
         private readonly TenureInfoGateway _classUnderTest;
-        private AwsIntegrationTests _dbTestFixture;
-        private IDynamoDBContext DynamoDb => _dbTestFixture.DynamoDbContext;
+        private readonly IDynamoDbFixture _dbFixture;
+        private IDynamoDBContext DynamoDb => _dbFixture.DynamoDbContext;
         private readonly List<Action> _cleanup = new List<Action>();
 
-        public TenureInfoGatewayTests(AwsIntegrationTests dbTestFixture)
+        public TenureInfoGatewayTests(MockApplicationFactory appFactory)
         {
-            _dbTestFixture = dbTestFixture;
+            _dbFixture = appFactory.DynamoDbFixture;
             _logger = new Mock<ILogger<TenureInfoGateway>>();
             _classUnderTest = new TenureInfoGateway(DynamoDb, _logger.Object);
         }
@@ -45,20 +47,13 @@ namespace TenureListener.Tests.Gateway
                 foreach (var action in _cleanup)
                     action();
 
-                if (_dbTestFixture != null)
-                {
-                    _dbTestFixture.Dispose();
-                    _dbTestFixture = null;
-                }
-
                 _disposed = true;
             }
         }
 
         private async Task InsertDatatoDynamoDB(TenureInformation entity)
         {
-            await DynamoDb.SaveAsync(entity.ToDatabase()).ConfigureAwait(false);
-            _cleanup.Add(async () => await DynamoDb.DeleteAsync<TenureInformationDb>(entity.Id).ConfigureAwait(false));
+            await _dbFixture.SaveEntityAsync(entity.ToDatabase()).ConfigureAwait(false);
         }
 
         private TenureInformation ConstructTenureInformation(bool nullTenuredAssetType = false, bool nullEndDate = false)
