@@ -1,5 +1,5 @@
+using Hackney.Core.Http;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace TenureListener.Tests.E2ETests.Steps
 {
@@ -9,18 +9,7 @@ namespace TenureListener.Tests.E2ETests.Steps
 
         public BaseSteps()
         {
-            _jsonOptions = CreateJsonOptions();
-        }
-
-        protected JsonSerializerOptions CreateJsonOptions()
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            return options;
+            _jsonOptions = JsonOptions.Create();
         }
     }
 }

@@ -1,3 +1,4 @@
+using Hackney.Core.Http;
 using Hackney.Core.Logging;
 using Hackney.Shared.Person.Boundary.Response;
 using System;

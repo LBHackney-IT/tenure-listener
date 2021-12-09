@@ -1,11 +1,11 @@
 using AutoFixture;
 using FluentAssertions;
+using Hackney.Core.Http;
 using Hackney.Shared.Person.Boundary.Response;
 using Moq;
 using System;
 using System.Threading.Tasks;
 using TenureListener.Gateway;
-using TenureListener.Gateway.Interfaces;
 using Xunit;
 
 namespace TenureListener.Tests.Gateway

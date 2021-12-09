@@ -1,6 +1,7 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Hackney.Core.DynamoDb;
+using Hackney.Core.Http;
 using Hackney.Core.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ namespace TenureListener
     [ExcludeFromCodeCoverage]
     public class SqsFunction : BaseFunction
     {
-        private readonly static JsonSerializerOptions _jsonOptions = CreateJsonOptions();
+        private readonly static JsonSerializerOptions _jsonOptions = JsonOptions.Create();
 
         /// <summary>
         /// Default constructor. This constructor is used by Lambda to construct the instance. When invoked in a Lambda environment
@@ -34,17 +35,6 @@ namespace TenureListener
         /// </summary>
         public SqsFunction()
         {
-        }
-
-        private static JsonSerializerOptions CreateJsonOptions()
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            return options;
         }
 
         protected override void ConfigureServices(IServiceCollection services)
@@ -60,9 +50,7 @@ namespace TenureListener
             services.AddScoped<IAccountApi, AccountApi>();
             services.AddScoped<ITenureInfoGateway, TenureInfoGateway>();
 
-            // Transient because otherwise all gateway's that use it will get the same instance,
-            // which is not the desired result.
-            services.AddTransient<IApiGateway, ApiGateway>();
+            services.AddApiGateway();
 
             base.ConfigureServices(services);
         }
