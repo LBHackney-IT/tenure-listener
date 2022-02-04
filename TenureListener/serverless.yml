@@ -8,7 +8,6 @@ provider:
     apiGateway: true
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
-  account: ${opt:account}
   region: eu-west-2
 
 package:
@@ -25,8 +24,8 @@ functions:
       AccountApiUrl: ${ssm:/housing-finance/${self:provider.stage}/account-api-url}
       AccountApiToken: ${ssm:/housing-tl/${self:provider.stage}/account-api-token}
     events:
-      - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn} 
-      
+      - sqs: ${ssm:/sqs-queue/${self:provider.stage}/tenures/arn}
+
 resources:
   Resources:
     lambdaExecutionRole:
@@ -45,7 +44,7 @@ resources:
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
           - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
-        Policies:          
+        Policies:
           - PolicyName: manageLogs
             PolicyDocument:
               Version: '2012-10-17'
