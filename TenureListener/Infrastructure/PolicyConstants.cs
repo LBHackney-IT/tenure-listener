@@ -1,4 +1,4 @@
-﻿namespace TenureListener.Infrastructure
+namespace TenureListener.Infrastructure
 {
     public static class PolicyConstants
     {

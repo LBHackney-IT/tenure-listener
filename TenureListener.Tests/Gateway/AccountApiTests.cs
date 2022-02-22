@@ -18,7 +18,7 @@ namespace TenureListener.Tests.Gateway
     {
         private readonly Mock<IApiGateway> _mockApiGateway;
         private readonly PolicyRegistry _mockPolicyRegistry;
-        
+
         private static readonly Guid _id = Guid.NewGuid();
         private static readonly Guid _correlationId = Guid.NewGuid();
         private const string AccountApiRoute = "https://some-domain.com/api";
@@ -95,10 +95,10 @@ namespace TenureListener.Tests.Gateway
         {
             var mockPolicy = new Mock<IAsyncPolicy>();
             _mockPolicyRegistry[PolicyConstants.WaitAndRetry] = mockPolicy.Object;
-            
+
             var sut = new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
             await sut.GetAccountByIdAsync(_id, _correlationId).ConfigureAwait(false);
-            
+
             mockPolicy.Verify(policy => policy.ExecuteAsync(It.IsAny<Func<Task<AccountResponseObject>>>()));
         }
     }

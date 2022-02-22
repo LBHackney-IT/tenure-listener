@@ -23,7 +23,7 @@ namespace TenureListener.Gateway
         {
             _apiGateway = apiGateway;
             _policyRegistry = policyRegistry;
-            
+
             _apiGateway.Initialise(ApiName, AccountApiUrl, AccountApiToken);
         }
 
@@ -31,7 +31,7 @@ namespace TenureListener.Gateway
         public async Task<AccountResponseObject> GetAccountByIdAsync(Guid id, Guid correlationId)
         {
             var route = $"{_apiGateway.ApiRoute}/accounts/{id}";
-            
+
             return await _policyRegistry
                 .Get<IAsyncPolicy>(PolicyConstants.WaitAndRetry)
                 .ExecuteAsync(() => _apiGateway.GetByIdAsync<AccountResponseObject>(route, id, correlationId));

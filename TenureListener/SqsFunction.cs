@@ -67,7 +67,7 @@ namespace TenureListener
 
             services.AddApiGateway();
             services.AddPollyRegistry();
-            
+
             base.ConfigureServices(services);
         }
 
