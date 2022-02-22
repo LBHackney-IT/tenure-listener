@@ -3,7 +3,10 @@ using Hackney.Core.Logging;
 using Hackney.Shared.Person.Boundary.Response;
 using System;
 using System.Threading.Tasks;
+using Polly;
+using Polly.Registry;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 
 namespace TenureListener.Gateway
 {
@@ -14,10 +17,13 @@ namespace TenureListener.Gateway
         private const string PersonApiToken = "PersonApiToken";
 
         private readonly IApiGateway _apiGateway;
+        private readonly IReadOnlyPolicyRegistry<string> _policyRegistry;
 
-        public PersonApi(IApiGateway apiGateway)
+        public PersonApi(IApiGateway apiGateway, IReadOnlyPolicyRegistry<string> policyRegistry)
         {
             _apiGateway = apiGateway;
+            _policyRegistry = policyRegistry;
+
             _apiGateway.Initialise(ApiName, PersonApiUrl, PersonApiToken);
         }
 
@@ -25,7 +31,10 @@ namespace TenureListener.Gateway
         public async Task<PersonResponseObject> GetPersonByIdAsync(Guid id, Guid correlationId)
         {
             var route = $"{_apiGateway.ApiRoute}/persons/{id}";
-            return await _apiGateway.GetByIdAsync<PersonResponseObject>(route, id, correlationId);
+
+            return await _policyRegistry
+                .Get<IAsyncPolicy>(PolicyConstants.WaitAndRetry)
+                .ExecuteAsync(() => _apiGateway.GetByIdAsync<PersonResponseObject>(route, id, correlationId));
         }
     }
 }
