@@ -4,9 +4,11 @@ using Hackney.Core.Http;
 using Moq;
 using System;
 using System.Threading.Tasks;
+using Polly;
+using Polly.Registry;
 using TenureListener.Domain.Account;
 using TenureListener.Gateway;
-using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using Xunit;
 
 namespace TenureListener.Tests.Gateway
@@ -15,6 +17,7 @@ namespace TenureListener.Tests.Gateway
     public class AccountApiTests
     {
         private readonly Mock<IApiGateway> _mockApiGateway;
+        private readonly PolicyRegistry _mockPolicyRegistry;
 
         private static readonly Guid _id = Guid.NewGuid();
         private static readonly Guid _correlationId = Guid.NewGuid();
@@ -32,6 +35,11 @@ namespace TenureListener.Tests.Gateway
             _mockApiGateway.SetupGet(x => x.ApiName).Returns(ApiName);
             _mockApiGateway.SetupGet(x => x.ApiRoute).Returns(AccountApiRoute);
             _mockApiGateway.SetupGet(x => x.ApiToken).Returns(AccountApiToken);
+
+            _mockPolicyRegistry = new PolicyRegistry
+            {
+                { PolicyConstants.WaitAndRetry, Policy.NoOpAsync() }
+            };
         }
 
         private static string Route => $"{AccountApiRoute}/accounts/{_id}";
@@ -40,7 +48,7 @@ namespace TenureListener.Tests.Gateway
         [Fact]
         public void ConstructorTestInitialisesApiGateway()
         {
-            new AccountApi(_mockApiGateway.Object);
+            new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
             _mockApiGateway.Verify(x => x.Initialise(ApiName, AccountApiUrlKey, AccountApiTokenKey, null),
                                    Times.Once);
         }
@@ -52,7 +60,7 @@ namespace TenureListener.Tests.Gateway
             _mockApiGateway.Setup(x => x.GetByIdAsync<AccountResponseObject>(Route, _id, _correlationId))
                            .ThrowsAsync(new Exception(exMessage));
 
-            var sut = new AccountApi(_mockApiGateway.Object);
+            var sut = new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
             Func<Task<AccountResponseObject>> func =
                 async () => await sut.GetAccountByIdAsync(_id, _correlationId).ConfigureAwait(false);
 
@@ -62,7 +70,7 @@ namespace TenureListener.Tests.Gateway
         [Fact]
         public async Task GetAccountByIdAsyncNotFoundReturnsNull()
         {
-            var sut = new AccountApi(_mockApiGateway.Object);
+            var sut = new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
             var result = await sut.GetAccountByIdAsync(_id, _correlationId).ConfigureAwait(false);
 
             result.Should().BeNull();
@@ -76,10 +84,22 @@ namespace TenureListener.Tests.Gateway
             _mockApiGateway.Setup(x => x.GetByIdAsync<AccountResponseObject>(Route, _id, _correlationId))
                            .ReturnsAsync(account);
 
-            var sut = new AccountApi(_mockApiGateway.Object);
+            var sut = new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
             var result = await sut.GetAccountByIdAsync(_id, _correlationId).ConfigureAwait(false);
 
             result.Should().BeEquivalentTo(account);
+        }
+
+        [Fact]
+        public async Task GetAccountByIdUsesWaitAndRetryPolicy()
+        {
+            var mockPolicy = new Mock<IAsyncPolicy>();
+            _mockPolicyRegistry[PolicyConstants.WaitAndRetry] = mockPolicy.Object;
+
+            var sut = new AccountApi(_mockApiGateway.Object, _mockPolicyRegistry);
+            await sut.GetAccountByIdAsync(_id, _correlationId).ConfigureAwait(false);
+
+            mockPolicy.Verify(policy => policy.ExecuteAsync(It.IsAny<Func<Task<AccountResponseObject>>>()));
         }
     }
 }

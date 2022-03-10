@@ -7,13 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Hackney.Core.Http.Exceptions;
+using Polly;
 using TenureListener.Boundary;
 using TenureListener.Factories;
 using TenureListener.Gateway;
 using TenureListener.Gateway.Interfaces;
+using TenureListener.Infrastructure;
 using TenureListener.UseCase;
 using TenureListener.UseCase.Interfaces;
 
@@ -62,6 +66,7 @@ namespace TenureListener
             services.AddScoped<ITenureInfoGateway, TenureInfoGateway>();
 
             services.AddApiGateway();
+            services.AddPollyRegistry();
 
             base.ConfigureServices(services);
         }
