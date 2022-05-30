@@ -175,7 +175,7 @@ jobs:
   terraform-compliance-development:
     executor: docker-terraform
     steps:
-      - terraform-complaince:
+      - terraform-compliance:
           environment: "development"
   terraform-apply-development:
     executor: docker-terraform
