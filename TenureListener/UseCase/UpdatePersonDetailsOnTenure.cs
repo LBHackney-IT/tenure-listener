@@ -81,7 +81,7 @@ namespace TenureListener.UseCase
                         _logger.LogWarning($"Person record (id: {person.Id}) has tenure for id {tenureId} but is not listed in the tenure's household members.");
                         continue;
                     }
-                    
+
                     var isUpdated = UpdateTenureRecord(person, tenureHouseholdMember, tenure);
                     if (isUpdated) await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
                 }
