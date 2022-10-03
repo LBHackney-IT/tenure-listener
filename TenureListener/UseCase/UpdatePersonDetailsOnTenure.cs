@@ -1,3 +1,4 @@
+using Hackney.Shared.Person.Boundary.Response;
 using Hackney.Shared.Tenure.Domain;
 using Microsoft.Extensions.Logging;
 using System;
@@ -23,6 +24,30 @@ namespace TenureListener.UseCase
             _personApi = personApi;
             _gateway = gateway;
             _logger = logger;
+        }
+
+        private bool UpdateTenureRecord(PersonResponseObject person, HouseholdMembers tenureHouseholdMember, TenureInformation tenure)
+        {
+            bool isUpdated = false;
+
+            // Get DoB if updated
+            var personDoB = DateTime.Parse(person.DateOfBirth);
+            if (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date)
+            {
+                tenureHouseholdMember.DateOfBirth = personDoB;
+                isUpdated = true;
+            }
+
+            // Get new name if updated & person is a named tenure holder of an active tenure
+            if ((person.GetFullName() != tenureHouseholdMember.FullName)
+                && (tenure.IsActive)
+                && (tenureHouseholdMember.PersonTenureType == PersonTenureType.Tenant))
+            {
+                tenureHouseholdMember.FullName = person.GetFullName();
+                isUpdated = true;
+            }
+
+            return isUpdated;
         }
 
         public async Task ProcessMessageAsync(EntityEventSns message)
@@ -56,27 +81,9 @@ namespace TenureListener.UseCase
                         _logger.LogWarning($"Person record (id: {person.Id}) has tenure for id {tenureId} but is not listed in the tenure's household members.");
                         continue;
                     }
-
-                    bool isUpdated = false;
-
-                    var personDoB = DateTime.Parse(person.DateOfBirth);
-                    if (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date)
-                    {
-                        tenureHouseholdMember.DateOfBirth = personDoB;
-                        isUpdated = true;
-                    }
-
-                    if ((person.GetFullName() != tenureHouseholdMember.FullName)
-                        && (tenure.IsActive)
-                        && (tenureHouseholdMember.PersonTenureType == PersonTenureType.Tenant))
-                    // if name is updated & person is a tenant of a active tenure, then update it
-                    {
-                        tenureHouseholdMember.FullName = person.GetFullName();
-                        isUpdated = true;
-                    }
-
+                    
+                    var isUpdated = UpdateTenureRecord(person, tenureHouseholdMember, tenure);
                     if (isUpdated) await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
-
                 }
             }
         }
