@@ -303,11 +303,10 @@ namespace TenureListener.Tests.UseCase
             _person.Tenures = _person.Tenures.Concat(_fixture.Build<TenureResponseObject>()
                                                              .With(x => x.IsActive, false)
                                                              .CreateMany(numInactiveTenures));
-            var tenures = new List<TenureInformation>();
+
             foreach (var personTenure in _person.Tenures)
             {
                 var tenureInfo = CreateTenure(personTenure.Id, _person, personTenure.IsActive, true);
-                tenures.Add(tenureInfo);
                 _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(personTenure.Id))
                             .ReturnsAsync(tenureInfo);
             }
@@ -334,13 +333,11 @@ namespace TenureListener.Tests.UseCase
             int numNotTenantTenures = 2;
             _person.Tenures = _fixture.CreateMany<TenureResponseObject>(numTenantTenures + numNotTenantTenures);
 
-            var tenures = new List<TenureInformation>();
             foreach (var item in _person.Tenures.Select((value, index) => new { index, value })) // getting index in foreach
             {
                 var personTenure = item.value;
                 var tenureInfo = CreateTenure(personTenure.Id, _person, true, (item.index < numTenantTenures));
                 // person is tenant on first 5 tenures
-                tenures.Add(tenureInfo);
                 _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(personTenure.Id))
                             .ReturnsAsync(tenureInfo);
             }
