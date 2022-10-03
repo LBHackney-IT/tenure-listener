@@ -1,3 +1,4 @@
+using Hackney.Shared.Tenure.Domain;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -56,16 +57,26 @@ namespace TenureListener.UseCase
                         continue;
                     }
 
+                    bool isUpdated = false;
+
                     var personDoB = DateTime.Parse(person.DateOfBirth);
-                    // Only bother if these details (name and date of birth) have changed...
+                    if (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date)
+                    {
+                        tenureHouseholdMember.DateOfBirth = personDoB;
+                        isUpdated = true;
+                    }
+
                     if ((person.GetFullName() != tenureHouseholdMember.FullName)
-                        || (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date))
+                        && (tenure.IsActive)
+                        && (tenureHouseholdMember.PersonTenureType == PersonTenureType.Tenant))
+                    // if name is updated & person is a tenant of a active tenure, then update it
                     {
                         tenureHouseholdMember.FullName = person.GetFullName();
-                        tenureHouseholdMember.DateOfBirth = personDoB;
-
-                        await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
+                        isUpdated = true;
                     }
+
+                    if (isUpdated) await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
+
                 }
             }
         }
