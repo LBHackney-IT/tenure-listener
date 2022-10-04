@@ -38,13 +38,15 @@ namespace TenureListener.UseCase
                 isUpdated = true;
             }
 
-            // Get new name if updated & person is a named tenure holder of an active tenure
-            if ((person.GetFullName() != tenureHouseholdMember.FullName)
-                && (tenure.IsActive)
-                && (tenureHouseholdMember.PersonTenureType == PersonTenureType.Tenant))
+            // Get new name if updated
+            if (person.GetFullName() != tenureHouseholdMember.FullName)
             {
-                tenureHouseholdMember.FullName = person.GetFullName();
-                isUpdated = true;
+                if (tenure.IsActive || tenureHouseholdMember.PersonTenureType != PersonTenureType.Tenant)
+                // only update if tenure is active or person is not named tenure holder
+                {
+                    tenureHouseholdMember.FullName = person.GetFullName();
+                    isUpdated = true;
+                }
             }
 
             return isUpdated;

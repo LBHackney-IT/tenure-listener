@@ -86,7 +86,7 @@ namespace TenureListener.Tests.E2ETests.Steps
         private void ValidateHouseholdMemberName(TenureInformation tenure, PersonResponseObject personResponse)
         {
             var householdMember = tenure.HouseholdMembers.First(x => x.Id == personResponse.Id);
-            if (tenure.IsActive && householdMember.PersonTenureType == PersonTenureType.Tenant)
+            if (tenure.IsActive || householdMember.PersonTenureType != PersonTenureType.Tenant)
             {
                 householdMember.FullName.Should().BeEquivalentTo(personResponse.GetFullName());
             }

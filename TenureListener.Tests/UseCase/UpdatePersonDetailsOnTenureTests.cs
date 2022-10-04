@@ -292,7 +292,7 @@ namespace TenureListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task PersonNameIsUpdatedOnlyOnActiveTenures()
+        public async Task PersonNameIsUpdatedOnAllActiveTenures()
         {
             int numActiveTenures = 5;
             _person.Tenures = _fixture.Build<TenureResponseObject>()
@@ -327,7 +327,7 @@ namespace TenureListener.Tests.UseCase
         }
 
         [Fact]
-        public async Task PersonNameIsUpdatedOnlyOnTenuresWherePersonIsTenant()
+        public async Task PersonNameIsUpdatedOnInactiveTenuresWherePersonIsNotTenant()
         {
             int numTenantTenures = 5;
             int numNotTenantTenures = 2;
@@ -336,7 +336,7 @@ namespace TenureListener.Tests.UseCase
             foreach (var item in _person.Tenures.Select((value, index) => new { index, value })) // getting index in foreach
             {
                 var personTenure = item.value;
-                var tenureInfo = CreateTenure(personTenure.Id, _person, true, (item.index < numTenantTenures));
+                var tenureInfo = CreateTenure(personTenure.Id, _person, false, (item.index < numTenantTenures));
                 // person is tenant on first 5 tenures
                 _mockGateway.Setup(x => x.GetTenureInfoByIdAsync(personTenure.Id))
                             .ReturnsAsync(tenureInfo);
@@ -354,7 +354,7 @@ namespace TenureListener.Tests.UseCase
             _mockGateway.Verify(x => x.GetTenureInfoByIdAsync(It.IsAny<Guid>()), Times.Exactly(numTenantTenures + numNotTenantTenures));
             _mockLogger.VerifyAny(LogLevel.Warning, Times.Never());
             _mockGateway.Verify(x => x.UpdateTenureInfoAsync(It.Is<TenureInformation>(y => VerifyUpdatedTenure(y, _person))),
-                                Times.Exactly(numTenantTenures));
+                                Times.Exactly(numNotTenantTenures));
         }
     }
 }
