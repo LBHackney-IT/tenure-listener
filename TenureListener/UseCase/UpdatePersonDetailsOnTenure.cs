@@ -1,3 +1,5 @@
+using Hackney.Shared.Person.Boundary.Response;
+using Hackney.Shared.Tenure.Domain;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -22,6 +24,32 @@ namespace TenureListener.UseCase
             _personApi = personApi;
             _gateway = gateway;
             _logger = logger;
+        }
+
+        private bool UpdateTenureRecord(PersonResponseObject person, HouseholdMembers tenureHouseholdMember, TenureInformation tenure)
+        {
+            bool isUpdated = false;
+
+            // Get DoB if updated
+            var personDoB = DateTime.Parse(person.DateOfBirth);
+            if (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date)
+            {
+                tenureHouseholdMember.DateOfBirth = personDoB;
+                isUpdated = true;
+            }
+
+            // Get new name if updated
+            if (person.GetFullName() != tenureHouseholdMember.FullName)
+            {
+                if (tenure.IsActive || tenureHouseholdMember.PersonTenureType != PersonTenureType.Tenant)
+                // only update if tenure is active or person is not named tenure holder
+                {
+                    tenureHouseholdMember.FullName = person.GetFullName();
+                    isUpdated = true;
+                }
+            }
+
+            return isUpdated;
         }
 
         public async Task ProcessMessageAsync(EntityEventSns message)
@@ -56,16 +84,8 @@ namespace TenureListener.UseCase
                         continue;
                     }
 
-                    var personDoB = DateTime.Parse(person.DateOfBirth);
-                    // Only bother if these details (name and date of birth) have changed...
-                    if ((person.GetFullName() != tenureHouseholdMember.FullName)
-                        || (personDoB.Date != tenureHouseholdMember.DateOfBirth.Date))
-                    {
-                        tenureHouseholdMember.FullName = person.GetFullName();
-                        tenureHouseholdMember.DateOfBirth = personDoB;
-
-                        await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
-                    }
+                    var isUpdated = UpdateTenureRecord(person, tenureHouseholdMember, tenure);
+                    if (isUpdated) await _gateway.UpdateTenureInfoAsync(tenure).ConfigureAwait(false);
                 }
             }
         }

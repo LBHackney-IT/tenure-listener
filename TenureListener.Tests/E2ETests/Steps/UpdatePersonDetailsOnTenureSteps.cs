@@ -7,6 +7,7 @@ using FluentAssertions;
 using Hackney.Shared.Person.Boundary.Response;
 using Hackney.Shared.Person.Domain;
 using Hackney.Shared.Tenure.Domain;
+using Hackney.Shared.Tenure.Factories;
 using Hackney.Shared.Tenure.Infrastructure;
 using Moq;
 using System;
@@ -82,15 +83,28 @@ namespace TenureListener.Tests.E2ETests.Steps
             lastHouseholdMember.PersonTenureType.Should().Be(tenureInfo.TenureType.GetPersonTenureType(isResponsible));
         }
 
+        private void ValidateHouseholdMemberName(TenureInformation tenure, PersonResponseObject personResponse)
+        {
+            var householdMember = tenure.HouseholdMembers.First(x => x.Id == personResponse.Id);
+            if (tenure.IsActive || householdMember.PersonTenureType != PersonTenureType.Tenant)
+            {
+                householdMember.FullName.Should().BeEquivalentTo(personResponse.GetFullName());
+            }
+            else
+            {
+                householdMember.FullName.Should().NotBe(personResponse.GetFullName());
+            }
+        }
+
         public async Task ThenAllTenuresAreUpdated(IDynamoDBContext dbContext, PersonResponseObject personResponse)
         {
             foreach (var personTenureId in personResponse.Tenures.Select(x => x.Id))
             {
                 var tenure = await dbContext.LoadAsync<TenureInformationDb>(personTenureId).ConfigureAwait(false);
 
-                var householdMember = tenure.HouseholdMembers.First(x => x.Id == personResponse.Id);
-                householdMember.FullName.Should().BeEquivalentTo(personResponse.GetFullName());
+                var householdMember = tenure.HouseholdMembers.Find(x => x.Id == personResponse.Id);
                 householdMember.DateOfBirth.Should().Be(DateTime.Parse(personResponse.DateOfBirth));
+                ValidateHouseholdMemberName(tenure.ToDomain(), personResponse);
             }
         }
 
