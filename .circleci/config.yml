@@ -296,36 +296,21 @@ workflows:
           context: api-assume-role-housing-staging-context
           requires:
               - build-and-test
-          filters:
-             branches:
-               only: release
       - terraform-init-and-plan-staging:
           requires:
             - assume-role-staging
-          filters:
-            branches:
-              only: release
       - terraform-compliance-staging:
           requires:
             - terraform-init-and-plan-staging
-          filters:
-            branches:
-              only: release
       - terraform-apply-staging:
           requires:
             - terraform-compliance-staging
-          filters:
-            branches:
-              only: release
       - deploy-to-staging:
           context:
             - api-nuget-token-context
             - "Serverless Framework"
           requires:
             - terraform-apply-staging
-          filters:
-            branches:
-              only: release
       - permit-production-terraform-release:
           type: approval
           requires:
@@ -334,41 +319,23 @@ workflows:
           context: api-assume-role-housing-production-context
           requires:
               - permit-production-terraform-release
-          filters:
-             branches:
-               only: release
       - terraform-init-and-plan-production:
           requires:
             - assume-role-production
-          filters:
-            branches:
-              only: release
       - terraform-compliance-production:
           requires:
             - terraform-init-and-plan-production
-          filters:
-            branches:
-              only: release
       - terraform-apply-production:
           requires:
             - terraform-compliance-production
-          filters:
-            branches:
-              only: release
       - permit-production-release:
           type: approval
           requires:
             - deploy-to-staging
             - terraform-apply-production
-          filters:
-            branches:
-              only: release
       - deploy-to-production:
           context:
             - api-nuget-token-context
             - "Serverless Framework"
           requires:
             - permit-production-release
-          filters:
-            branches:
-              only: release
