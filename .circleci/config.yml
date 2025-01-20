@@ -227,14 +227,38 @@ jobs:
           stage: "production"
 
 workflows:
-  check-and-deploy-development:
+  check:
     jobs:
       - check-code-formatting:
           context: api-nuget-token-context
+          filters:
+            branches:
+              ignore:
+                - release
+                - master
       - build-and-test:
           context:
             - api-nuget-token-context
             - SonarCloud
+          filters:
+            branches:
+              ignore:
+                - release
+                - master
+  check-and-deploy-development:
+    jobs:
+      - check-code-formatting:
+          context: api-nuget-token-context
+          filters:
+            branches:
+              only: master
+      - build-and-test:
+          context:
+            - api-nuget-token-context
+            - SonarCloud
+          filters:
+            branches:
+              only: master
       - assume-role-development:
           context: api-assume-role-housing-development-context
           requires:
@@ -248,18 +272,12 @@ workflows:
       - terraform-apply-development:
           requires:
             - terraform-compliance-development
-          filters:
-            branches:
-              only: master
       - deploy-to-development:
           context:
             - api-nuget-token-context
             - "Serverless Framework"
           requires:
             - terraform-apply-development
-          filters:
-            branches:
-              only: master
   check-and-deploy-staging-and-production:
       jobs:
       - check-code-formatting:
