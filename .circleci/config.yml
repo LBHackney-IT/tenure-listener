@@ -227,7 +227,7 @@ jobs:
           stage: "production"
 
 workflows:
-  check:
+  feature:
     jobs:
       - check-code-formatting:
           context: api-nuget-token-context
@@ -245,7 +245,7 @@ workflows:
               ignore:
                 - release
                 - master
-  check-and-deploy-development:
+  development:
     jobs:
       - check-code-formatting:
           context: api-nuget-token-context
@@ -278,7 +278,7 @@ workflows:
             - "Serverless Framework"
           requires:
             - terraform-apply-development
-  check-and-deploy-staging-and-production:
+  staging-and-production:
       jobs:
       - check-code-formatting:
           context: api-nuget-token-context
