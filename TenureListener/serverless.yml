@@ -123,8 +123,8 @@ custom:
       securityGroupIds:
         - sg-01c5530a6d9e89840
       subnetIds:
-        - subnet-
-        - subnet-
+        - subnet-0140d06fb84fdb547
+        - subnet-05ce390ba88c42bfd
     staging:
       subnetIds:
         - subnet-0ea0020a44b98a2ca
