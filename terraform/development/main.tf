@@ -38,6 +38,18 @@ terraform {
   }
 }
 
+data "aws_vpc" "housing_development_vpc" {
+  tags = {
+    Name = "housing-dev"
+  }
+}
+
+module "tenure_listener_sg" {
+  source              = "../modules/security_groups/outbound_only_traffic"
+  vpc_id              = data.aws_vpc.housing_development_vpc.id
+  user_resource_name  = "tenure_listener"
+  environment_name    = var.environment_name
+}
 
 data "aws_ssm_parameter" "person_sns_topic_arn" {
   name = "/sns-topic/development/person/arn"

@@ -37,6 +37,18 @@ terraform {
   }
 }
 
+data "aws_vpc" "housing_staging_vpc" {
+  tags = {
+    Name = "housing-stg"
+  }
+}
+
+module "tenure_listener_sg" {
+  source              = "../modules/security_groups/outbound_only_traffic"
+  vpc_id              = data.aws_vpc.housing_staging_vpc.id
+  user_resource_name  = "tenure_listener"
+  environment_name    = var.environment_name
+}
 
 data "aws_ssm_parameter" "person_sns_topic_arn" {
   name = "/sns-topic/staging/person/arn"
