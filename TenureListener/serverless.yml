@@ -123,12 +123,12 @@ custom:
       securityGroupIds:
         - sg-01c5530a6d9e89840
       subnetIds:
-        - subnet-0ea0020a44b98a2ca
-        - subnet-0743d86e9b362fa38
+        - subnet-
+        - subnet-
     staging:
       subnetIds:
-        - subnet-06d3de1bd9181b0d7
-        - subnet-0ed7d7713d1127656
+        - subnet-0ea0020a44b98a2ca
+        - subnet-0743d86e9b362fa38
     production:
       subnetIds:
         - subnet-01d3657f97a243261
