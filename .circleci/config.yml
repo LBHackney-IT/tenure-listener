@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0
 
 executors:
   docker-python:
@@ -165,6 +166,13 @@ jobs:
       - run:
           name: Run tests
           command: docker compose run tenure-listener-test
+      - run:
+          name: Report
+          command: |
+            mkdir coverage
+            docker cp $(docker ps -aqf "name=tenure-listener-test"):/app/coverage ./
+            sed -i "s|/app/|$(pwd)/|g" coverage/*/coverage.opencover.xml
+      - sonarcloud/scan
   assume-role-development:
     executor: docker-python
     steps:
