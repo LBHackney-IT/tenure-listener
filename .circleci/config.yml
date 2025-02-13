@@ -165,6 +165,11 @@ jobs:
       - run:
           name: Run tests
           command: docker compose run tenure-listener-test
+      - run:
+          name: Report
+          command: |
+            mkdir coverage
+            docker cp $(docker ps -aqf "name=tenure-listener-test"):/app/coverage ./
   assume-role-development:
     executor: docker-python
     steps:
