@@ -8,15 +8,10 @@ ENV LBHPACKAGESTOKEN=$LBHPACKAGESTOKEN
 
 WORKDIR /app
 
-COPY ./TenureListener.sln ./
-COPY ./TenureListener/TenureListener.csproj ./TenureListener/
-COPY ./TenureListener.Tests/TenureListener.Tests.csproj ./TenureListener.Tests/
-COPY /NuGet.Config /root/.nuget/NuGet/NuGet.Config
+COPY . .
 
 RUN dotnet restore ./TenureListener/TenureListener.csproj
 RUN dotnet restore ./TenureListener.Tests/TenureListener.Tests.csproj
-
-COPY . .
 
 RUN dotnet build -c Release -o out TenureListener/TenureListener.csproj
 RUN dotnet build -c debug -o out TenureListener.Tests/TenureListener.Tests.csproj
