@@ -10,8 +10,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN dotnet restore ./TenureListener/TenureListener.csproj
-RUN dotnet restore ./TenureListener.Tests/TenureListener.Tests.csproj
+RUN dotnet restore
 
 RUN dotnet build -c Release -o out TenureListener/TenureListener.csproj
 RUN dotnet build -c debug -o out TenureListener.Tests/TenureListener.Tests.csproj
