@@ -12,7 +12,6 @@ COPY . .
 
 RUN dotnet restore
 
-RUN dotnet build -c Release -o out TenureListener/TenureListener.csproj
-RUN dotnet build -c debug -o out TenureListener.Tests/TenureListener.Tests.csproj
+RUN dotnet build
 
 ENTRYPOINT ["dotnet", "test", "--collect", "XPlat Code Coverage;Format=opencover", "--results-directory", "./coverage"]
