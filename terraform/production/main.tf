@@ -30,7 +30,7 @@ locals {
 
 terraform {
   backend "s3" {
-    bucket  = "terraform-state-housing-production"
+    bucket  = "terraform-state-disaster-recovery"
     encrypt = true
     region  = "eu-west-2"
     key     = "services/tenure-listener/state"
@@ -39,7 +39,7 @@ terraform {
 
 data "aws_vpc" "housing_production_vpc" {
   tags = {
-    Name = "housing-prod"
+    Name = "disaster-recovery-prod"
   }
 }
 
@@ -50,13 +50,13 @@ module "tenure_listener_sg" {
   environment_name    = var.environment_name
 }
 
-data "aws_ssm_parameter" "person_sns_topic_arn" {
-  name = "/sns-topic/production/person/arn"
-}
+# data "aws_ssm_parameter" "person_sns_topic_arn" {
+#   name = "/sns-topic/production/person/arn"
+# }
 
-data "aws_ssm_parameter" "accounts_sns_topic_arn" {
-  name = "/sns-topic/production/accounts/arn"
-}
+# data "aws_ssm_parameter" "accounts_sns_topic_arn" {
+#   name = "/sns-topic/production/accounts/arn"
+# }
 
 resource "aws_sqs_queue" "tenure_dead_letter_queue" {
   name                              = "tenuresdeadletterqueue.fifo"
@@ -78,60 +78,61 @@ resource "aws_sqs_queue" "tenure_queue" {
   })
 }
 
-resource "aws_sqs_queue_policy" "tenure_queue_policy" {
-  queue_url = aws_sqs_queue.tenure_queue.id
-  policy    = <<POLICY
-  {
-      "Version": "2012-10-17",
-      "Id": "sqspolicy",
-      "Statement": [
-          {
-              "Sid": "First",
-              "Effect": "Allow",
-              "Principal": "*",
-              "Action": "sqs:SendMessage",
-              "Resource": "${aws_sqs_queue.tenure_queue.arn}",
-              "Condition": {
-              "ArnEquals": {
-                  "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
-              }
-              }
-          },          
-          {
-              "Sid": "Second",
-              "Effect": "Allow",
-              "Principal": "*",
-              "Action": "sqs:SendMessage",
-              "Resource": "${aws_sqs_queue.tenure_queue.arn}",
-              "Condition": {
-              "ArnEquals": {
-                  "aws:SourceArn": "${data.aws_ssm_parameter.accounts_sns_topic_arn.value}"
-              }
-              }
-          }
-      ]
-  }
-  POLICY
-}
+# resource "aws_sqs_queue_policy" "tenure_queue_policy" {
+#   queue_url = aws_sqs_queue.tenure_queue.id
+#   policy    = <<POLICY
+#   {
+#       "Version": "2012-10-17",
+#       "Id": "sqspolicy",
+#       "Statement": [
+#           {
+#               "Sid": "First",
+#               "Effect": "Allow",
+#               "Principal": "*",
+#               "Action": "sqs:SendMessage",
+#               "Resource": "${aws_sqs_queue.tenure_queue.arn}",
+#               "Condition": {
+#               "ArnEquals": {
+#                   "aws:SourceArn": "${data.aws_ssm_parameter.person_sns_topic_arn.value}"
+#               }
+#               }
+#           },          
+#           {
+#               "Sid": "Second",
+#               "Effect": "Allow",
+#               "Principal": "*",
+#               "Action": "sqs:SendMessage",
+#               "Resource": "${aws_sqs_queue.tenure_queue.arn}",
+#               "Condition": {
+#               "ArnEquals": {
+#                   "aws:SourceArn": "${data.aws_ssm_parameter.accounts_sns_topic_arn.value}"
+#               }
+#               }
+#           }
+#       ]
+#   }
+#   POLICY
+# }
 
-resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_person_sns" {
-  topic_arn            = data.aws_ssm_parameter.person_sns_topic_arn.value
-  protocol             = "sqs"
-  endpoint             = aws_sqs_queue.tenure_queue.arn
-  raw_message_delivery = true
-}
+# resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_person_sns" {
+#   topic_arn            = data.aws_ssm_parameter.person_sns_topic_arn.value
+#   protocol             = "sqs"
+#   endpoint             = aws_sqs_queue.tenure_queue.arn
+#   raw_message_delivery = true
+# }
 
-resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_accounts_sns" {
-  topic_arn            = data.aws_ssm_parameter.accounts_sns_topic_arn.value
-  protocol             = "sqs"
-  endpoint             = aws_sqs_queue.tenure_queue.arn
-  raw_message_delivery = true
-}
+# resource "aws_sns_topic_subscription" "tenure_queue_subscribe_to_accounts_sns" {
+#   topic_arn            = data.aws_ssm_parameter.accounts_sns_topic_arn.value
+#   protocol             = "sqs"
+#   endpoint             = aws_sqs_queue.tenure_queue.arn
+#   raw_message_delivery = true
+# }
 
 resource "aws_ssm_parameter" "tenures_sqs_queue_arn" {
   name  = "/sqs-queue/production/tenures/arn"
   type  = "String"
   value = aws_sqs_queue.tenure_queue.arn
+  overwrite = true
 }
 
 module "tenure_listener_cw_dashboard" {
