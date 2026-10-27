@@ -101,46 +101,6 @@ commands:
           root: *workspace_root
           paths:
             - .aws
-  terraform-destroy-plan:
-    description: "Creates a Terraform destroy plan and makes it available for review."
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - run:
-          name: create destroy plan
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform get -update=true
-            terraform init
-            terraform plan -destroy -out=destroy.plan
-            terraform show -no-color destroy.plan > destroy-plan.txt
-      - store_artifacts:
-          path: terraform/<<parameters.environment>>/destroy-plan.txt
-      - persist_to_workspace:
-          root: *workspace_root
-          paths:
-            - .aws
-            - project/*
-  terraform-destroy:
-    description: "Destroys resources using the approved Terraform destroy plan."
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - run:
-          name: destroy
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform apply -auto-approve destroy.plan
-      - persist_to_workspace:
-          root: *workspace_root
-          paths:
-            - .aws
   terraform-preview:
     description: "Gives a preview for Terraform configuration changes."
     parameters:
@@ -180,23 +140,6 @@ commands:
           command: |
             cd ./TenureListener/
             sls deploy --stage <<parameters.stage>> --conceal
-  remove-lambda:
-    description: "Removes a Serverless-managed Lambda stack."
-    parameters:
-      stage:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - node/install
-      - run:
-          name: Install Serverless Framework v4
-          command: npm i -g serverless@4
-      - run:
-          name: Remove lambda
-          command: |
-            cd ./TenureListener/
-            sls remove --stage <<parameters.stage>>
 
 jobs:
   check-code-formatting:
@@ -317,46 +260,6 @@ jobs:
     steps:
       - deploy-lambda:
           stage: "production"
-  assume-role-pre-production:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_PRE_PRODUCTION
-  terraform-init-and-plan-pre-production:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-plan:
-          environment: "pre-production"
-  terraform-compliance-pre-production:
-    executor: docker-terraform
-    steps:
-      - terraform-compliance:
-          environment: "pre-production"
-  terraform-apply-pre-production:
-    executor: docker-terraform
-    steps:
-      - terraform-apply:
-          environment: "pre-production"
-  terraform-destroy-plan-pre-production:
-    executor: docker-terraform
-    steps:
-      - terraform-destroy-plan:
-          environment: "pre-production"
-  terraform-destroy-pre-production:
-    executor: docker-terraform
-    steps:
-      - terraform-destroy:
-          environment: "pre-production"
-  deploy-to-pre-production:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "pre-production"
-  remove-from-pre-production:
-    executor: docker-dotnet
-    steps:
-      - remove-lambda:
-          stage: "pre-production"
 
 workflows:
   feature:
@@ -507,72 +410,3 @@ workflows:
             - "Serverless Framework"
           requires:
             - permit-production-release
-
-  deploy-terraform-pre-production:
-    jobs:
-      - permit-pre-production-terraform-workflow:
-          type: approval
-          filters:
-            branches:
-              only: release
-      - assume-role-pre-production:
-          context: api-assume-role-housing-pre-production-context
-          requires:
-            - permit-pre-production-terraform-workflow
-      - terraform-init-and-plan-pre-production:
-          requires:
-            - assume-role-pre-production
-      - terraform-compliance-pre-production:
-          requires:
-            - terraform-init-and-plan-pre-production
-      - permit-pre-production-terraform-deployment:
-          type: approval
-          requires:
-            - terraform-compliance-pre-production
-      - terraform-apply-pre-production:
-          requires:
-            - permit-pre-production-terraform-deployment
-
-  deploy-code-pre-production:
-    jobs:
-      - build-and-test:
-          context: 
-            - api-nuget-token-context
-            - SonarCloud
-          filters:
-            branches:
-              only: release
-      - assume-role-pre-production:
-          context: api-assume-role-housing-pre-production-context
-          requires:
-            - build-and-test
-      - deploy-to-pre-production:
-          context:
-          - api-nuget-token-context
-          - "Serverless Framework"
-          requires:
-            - assume-role-pre-production        
-
-  teardown-pre-production:
-    jobs:
-      - assume-role-pre-production:
-          context: api-assume-role-housing-pre-production-context
-          filters:
-            branches:
-              only: feat/ssi-1369-teardown-pre-production
-      - terraform-destroy-plan-pre-production:
-          requires:
-            - assume-role-pre-production
-      - approve-pre-production-terraform-destroy:
-          type: approval
-          requires:
-            - terraform-destroy-plan-pre-production
-      - remove-from-pre-production:
-          context:
-            - api-nuget-token-context
-            - "Serverless Framework"
-          requires:
-            - approve-pre-production-terraform-destroy
-      - terraform-destroy-pre-production:
-          requires:
-            - remove-from-pre-production
